@@ -35,11 +35,7 @@ class GlobalConsumer(AsyncWebsocketConsumer):
         self.user = self.scope["user"]
         self.user_group = channel_name("user", self.user.id)
 
-        self.handlers = {
-            handler_cls.prefix: handler_cls(self)
-            for handler_cls
-            in self.HANDLER_CLASSES
-        }
+        self.handlers = {handler_cls.prefix: handler_cls(self) for handler_cls in self.HANDLER_CLASSES}
 
         await self.accept()
 

@@ -5,7 +5,7 @@ from .unsplash import (
 )
 
 __all__ = [
+    "UnsplashDownloadSerializer",
     "UnsplashPhotoSerializer",
     "UnsplashSearchQuerySerializer",
-    "UnsplashDownloadSerializer",
 ]

@@ -10,10 +10,10 @@ from .size import (
 )
 
 __all__ = [
-    "IMAGE_EXTENSIONS",
-    "VIDEO_EXTENSIONS",
     "DOCUMENT_EXTENSIONS",
-    "TEXT_EXTENSIONS",
+    "IMAGE_EXTENSIONS",
     "MAX_FILE_SIZE",
     "MIN_FILE_SIZE",
+    "TEXT_EXTENSIONS",
+    "VIDEO_EXTENSIONS",
 ]

@@ -11,13 +11,13 @@ from .time_stamp import (
 from .uuid import UUIDModel
 
 __all__ = [
-    "UUIDModel",
-    "SoftDeleteModel",
+    "CoverStyleModel",
     "CreatedModel",
+    "FileCleanupModel",
+    "SoftDeleteModel",
     "TimeStampedModel",
     "TimeStampedSoftDeleteModel",
-    "UpdatedModel",
     "TypedModelMeta",
-    "FileCleanupModel",
-    "CoverStyleModel",
+    "UUIDModel",
+    "UpdatedModel",
 ]

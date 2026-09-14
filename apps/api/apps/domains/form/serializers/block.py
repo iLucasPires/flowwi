@@ -35,17 +35,17 @@ class FormBlockSerializer(serializers.ModelSerializer):
 
         if not page:
             return
-        
+
         form = attrs.get("form") or getattr(self.instance, "form", None)
         if form and page.form_id != form.id:
             raise serializers.ValidationError({"page": "Page must belong to the same form."})
 
     def _validate_config(self, attrs):
         block_type = attrs.get("type")
-        
+
         if not block_type:
             return
-        
+
         try:
             validate_form_config(block_type, attrs.get("config") or {})
         except DjangoValidationError as e:
@@ -55,7 +55,7 @@ class FormBlockSerializer(serializers.ModelSerializer):
         condition = attrs.get("condition")
         if not condition:
             return
-        
+
         try:
             validate_form_condition(condition)
         except DjangoValidationError as e:

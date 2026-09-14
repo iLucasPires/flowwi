@@ -5,9 +5,9 @@ from .task import TaskSerializer
 from .type import TaskTypeSerializer
 
 __all__ = [
-    "TaskSerializer",
     "SubTaskSerializer",
-    "TaskTagSerializer",
+    "TaskSerializer",
     "TaskStatusSerializer",
+    "TaskTagSerializer",
     "TaskTypeSerializer",
 ]

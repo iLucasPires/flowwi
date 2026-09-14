@@ -7,7 +7,6 @@ from apps.domains.workplace.models import Workplace
 from lib.models import CoverStyleModel, TimeStampedModel, UUIDModel
 from lib.utils.upload import upload_to_path
 
-1
 from .type import DocumentType
 
 User = get_user_model()

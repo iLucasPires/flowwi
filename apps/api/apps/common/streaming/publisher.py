@@ -62,9 +62,7 @@ def publish_resource_changed(workplace_id, resource: str, action: str, object_id
     event = f"{resource}.changed"
     data = {"id": str(object_id), "action": action, "workplace_id": str(workplace_id)}
 
-    member_user_ids = WorkplaceMember.objects.filter(workplace_id=workplace_id).values_list(
-        "user_id", flat=True
-    )
+    member_user_ids = WorkplaceMember.objects.filter(workplace_id=workplace_id).values_list("user_id", flat=True)
 
     for user_id in member_user_ids:
         publish_to_user(user_id, event, data)

@@ -90,9 +90,37 @@ dev = [
 [tool.ruff]
 target-version = "py312"
 line-length = 120
+extend-exclude = ["**/migrations"]
 
 [tool.ruff.lint]
-select = ["E", "F", "I", "UP"]
+select = [
+  "E",    # pycodestyle (erros)
+  "W",    # pycodestyle (avisos — whitespace, etc.)
+  "F",    # pyflakes
+  "I",    # isort
+  "UP",   # pyupgrade — sintaxe moderna para o target-version
+  "B",    # flake8-bugbear — bugs comuns e pegadinhas de design de API
+  "C4",   # flake8-comprehensions
+  "SIM",  # flake8-simplify
+  "PTH",  # flake8-use-pathlib — os.path -> pathlib
+  "PERF", # perflint
+  "T20",  # flake8-print — nada de print() esquecido em produção
+  "ISC",  # flake8-implicit-str-concat
+  "ERA",  # eradicate — código comentado morto
+  "DJ",   # flake8-django
+  "RUF",  # regras próprias do ruff
+]
+ignore = [
+  # Padrão do projeto: `expandable_fields = {...}` e afins como atributo de
+  # classe mutável (serializers, choices) — não é o bug que a regra assume.
+  "RUF012",
+]
 
 [tool.ruff.lint.isort]
 known-first-party = ["apps", "lib", "config"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+line-ending = "lf"
+skip-magic-trailing-comma = false

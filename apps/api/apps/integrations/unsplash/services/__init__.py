@@ -5,7 +5,7 @@ from .unsplash import (
 )
 
 __all__ = [
-    "UnsplashService",
     "UnsplashNotConfiguredError",
+    "UnsplashService",
     "UnsplashUnavailableError",
 ]

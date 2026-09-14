@@ -1,12 +1,12 @@
-import os
 import uuid
 from datetime import date
+from pathlib import Path
 
 from django.utils.deconstruct import deconstructible
 
 
 def upload_to_uuid(instance, filename):
-    ext = os.path.splitext(filename)[1].lower()
+    ext = Path(filename).suffix.lower()
     today = date.today()
 
     return f"uploads/{today.year}/{today.month:02d}/{today.day:02d}/{uuid.uuid4().hex}{ext}"
@@ -20,7 +20,7 @@ class upload_to_path:
         self.path_parts = path_parts
 
     def __call__(self, instance, filename):
-        ext = os.path.splitext(filename)[1].lower()
+        ext = Path(filename).suffix.lower()
         today = date.today()
         prefix = "/".join(self.path_parts)
 

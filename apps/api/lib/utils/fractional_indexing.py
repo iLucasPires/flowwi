@@ -143,7 +143,7 @@ def _midpoint(a: str, b: str | None, digits: str) -> str:
     if b:
         # Remove longest common prefix. Pad `a` com zeros conforme avançamos.
         n = 0
-        for x, y in zip(a.ljust(len(b), zero), b):
+        for x, y in zip(a.ljust(len(b), zero), b, strict=False):
             if x == y:
                 n += 1
             else:

@@ -1,4 +1,4 @@
-import os
+from pathlib import Path
 
 from lib.constants import (
     DOCUMENT_EXTENSIONS,
@@ -11,7 +11,7 @@ from .models import MediaVersionType
 
 
 def get_media_version_type_by_file_name(file_name: str) -> MediaVersionType:
-    ext = os.path.splitext(file_name)[1].lower()
+    ext = Path(file_name).suffix.lower()
 
     if ext in IMAGE_EXTENSIONS:
         return MediaVersionType.IMAGE

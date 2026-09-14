@@ -9,12 +9,12 @@ from .task import (
 from .type import TaskType
 
 __all__ = [
+    "SubTask",
     "Task",
     "TaskOrigin",
     "TaskPriority",
     "TaskStatus",
     "TaskStatusCategory",
-    "TaskType",
     "TaskTag",
-    "SubTask",
+    "TaskType",
 ]

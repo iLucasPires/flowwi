@@ -7,9 +7,9 @@ from .theme import FormThemeSerializer
 
 __all__ = [
     "FormBlockSerializer",
-    "FormSerializer",
-    "FormResponseSerializer",
-    "FormPublicSerializer",
     "FormPageSerializer",
+    "FormPublicSerializer",
+    "FormResponseSerializer",
+    "FormSerializer",
     "FormThemeSerializer",
 ]

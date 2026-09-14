@@ -115,7 +115,7 @@ class StickyViewSet(WorkplaceViewSetMixin, viewsets.ModelViewSet):
         position = request.data.get("position")
         if not position:
             return Response(
-                data={"position": ["This field is required."]}, 
+                data={"position": ["This field is required."]},
                 status=400,
             )
 

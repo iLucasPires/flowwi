@@ -5,9 +5,9 @@ from .task import TaskViewSet
 from .type import TaskTypeViewSet
 
 __all__ = [
-    "TaskViewSet",
     "SubTaskViewSet",
-    "TaskTagViewSet",
     "TaskStatusViewSet",
+    "TaskTagViewSet",
     "TaskTypeViewSet",
+    "TaskViewSet",
 ]

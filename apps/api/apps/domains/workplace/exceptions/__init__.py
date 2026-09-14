@@ -7,7 +7,7 @@ from .workplace import (
 
 __all__ = [
     "WorkplaceAlreadyJoined",
-    "WorkplaceNameAlreadyExists",
     "WorkplaceInviteKeyError",
+    "WorkplaceNameAlreadyExists",
     "WorkplaceNotFound",
 ]

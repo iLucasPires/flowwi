@@ -49,10 +49,7 @@ class FormBlockViewSet(WorkplaceViewSetMixin, ModelViewSet):
         service = FormBlockService()
         should_sync = pages or self._has_page_ordering(blocks)
 
-        if should_sync:
-            saved = service.bulk_sync(form, pages, blocks)
-        else:
-            saved = service.bulk_upsert(form, blocks)
+        saved = service.bulk_sync(form, pages, blocks) if should_sync else service.bulk_upsert(form, blocks)
 
         return Response(
             FormBlockSerializer(saved, many=True).data,
