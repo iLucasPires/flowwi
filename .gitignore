@@ -32,6 +32,10 @@ apps/app/components.d.ts
 apps/*/.claude/
 .claude/*
 !.claude/skills/
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+!.vscode/launch.json
 *.suo
 *.ntvs*
 *.njsproj

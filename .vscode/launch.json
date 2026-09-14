@@ -1,0 +1,33 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "API: Django runserver",
+      "type": "debugpy",
+      "request": "launch",
+      "cwd": "${workspaceFolder}/apps/api",
+      "program": "${workspaceFolder}/apps/api/manage.py",
+      "args": ["runserver", "0.0.0.0:8000", "--noreload"],
+      "django": true,
+      "justMyCode": true,
+      "envFile": "${workspaceFolder}/apps/api/.env"
+    },
+    {
+      "name": "API: Pytest (arquivo atual)",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "cwd": "${workspaceFolder}/apps/api",
+      "args": ["${file}", "-v"],
+      "justMyCode": true,
+      "envFile": "${workspaceFolder}/apps/api/.env"
+    },
+    {
+      "name": "App: dev server",
+      "type": "node-terminal",
+      "request": "launch",
+      "cwd": "${workspaceFolder}/apps/app",
+      "command": "pnpm dev"
+    }
+  ]
+}
