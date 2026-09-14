@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "skills": {
+    "django-drf": {
+      "source": "gentleman-programming/gentleman-skills",
+      "sourceType": "github",
+      "computedHash": "29364409b7891191f540d0f7b448885e803172365a3f520a36c2364fd4303c8b"
+    },
+    "django-expert": {
+      "source": "vintasoftware/django-ai-plugins",
+      "sourceType": "github",
+      "computedHash": "a6b8c224017570496d688a526fcbea74025a01cc90d9afb0977bfcc1f76af306"
+    }
+  }
+}

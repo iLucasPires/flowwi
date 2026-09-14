@@ -1,0 +1,45 @@
+{
+  "version": 1,
+  "skills": {
+    "nuxt-ui": {
+      "source": "nuxt/ui",
+      "sourceType": "github",
+      "skillPath": "skills/nuxt-ui/SKILL.md",
+      "computedHash": "de41e63eeda35c2bfdd3ed783d3e04361dc85bff28ad71f9c4dbdc01bb8f4e57"
+    },
+    "pinia": {
+      "source": "antfu/skills",
+      "sourceType": "github",
+      "computedHash": "897b6b0982956f41f5cc85128ca638b625e1b3c8bc619e303cd1e7661c95b7de"
+    },
+    "pinia-colada": {
+      "source": "pilag6/skills-claude-code",
+      "sourceType": "github",
+      "computedHash": "e86844fb7b7ad518c6c371a8aed70c8663c84b8165e2af66a330836a3a7a8aa1"
+    },
+    "tanstack-query": {
+      "source": "tanstack-skills/tanstack-skills",
+      "sourceType": "github",
+      "skillPath": "plugins/tanstack-query/skills/tanstack-query/SKILL.md",
+      "computedHash": "b8a0477cd4d7bf8fa54d27f8e64d82388402f0d502591db50a357df5b9995c75"
+    },
+    "tanstack-store": {
+      "source": "tanstack-skills/tanstack-skills",
+      "sourceType": "github",
+      "skillPath": "plugins/tanstack-store/skills/tanstack-store/SKILL.md",
+      "computedHash": "acfc5f1217685253fa9484f8f89dc92aae96a9ae30e42001b07b2ca672c758b2"
+    },
+    "tanstack-table": {
+      "source": "tanstack-skills/tanstack-skills",
+      "sourceType": "github",
+      "skillPath": "plugins/tanstack-table/skills/tanstack-table/SKILL.md",
+      "computedHash": "d5ac71bd795696cd3310165c3ea0e435c310a0ac3c4e9dd45b39ed91b8dbcbb1"
+    },
+    "vue": {
+      "source": "antfu/skills",
+      "sourceType": "github",
+      "skillPath": "skills/vue/SKILL.md",
+      "computedHash": "9c241141e07e836e4f0537c63e8f929fba3767c2997250be38e699f19b75e3f2"
+    }
+  }
+}

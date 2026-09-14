@@ -1,0 +1,9 @@
+{
+  "files.exclude": {
+    "**/.*": true,
+    "**/__pycache__": true
+  },
+  "kiroAgent.configureMCP": "Disabled",
+  "remote.autoForwardPortsFallback": 0,
+  "editor.fontFamily": "'JetBrains Mono', Consolas, 'Courier New', monospace"
+}

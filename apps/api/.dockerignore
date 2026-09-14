@@ -1,0 +1,80 @@
+# Python
+**/__pycache__/
+**/*.py[oc]
+**/*.pyc
+**/*.pyo
+**/*.pyd
+.Python
+**/build/
+**/dist/
+**/wheels/
+**/*.egg-info/
+**/.eggs/
+**/.pytest_cache/
+**/.mypy_cache/
+**/.ruff_cache/
+
+# Virtual environments
+**/.venv/
+**/venv/
+**/env/
+**/ENV/
+
+# IDE
+**/.vscode/
+**/.idea/
+**/*.swp
+**/*.swo
+**/*~
+**/.DS_Store
+
+# Environment files
+**/.env
+**/.env.local
+**/.env.*.local
+
+# Git
+**/.git/
+**/.gitignore
+**/.gitattributes
+
+# Documentation
+**/README.md
+**/docs/
+**/*.md
+
+# Testing
+**/.coverage
+**/htmlcov/
+**/.tox/
+**/.pytest_cache/
+**/test-results/
+
+# Static files (will be collected in container)
+**/.dist/
+**/staticfiles/
+**/media/
+
+# Logs
+**/*.log
+**/logs/
+
+# Database
+**/*.db
+**/*.sqlite3
+**/*.sqlite
+
+# Docker
+**/Dockerfile*
+**/docker-compose*.yml
+**/compose.yml
+**/.dockerignore
+
+# CI/CD
+**/.github/
+**/.gitlab-ci.yml
+**/.travis.yml
+
+# OS
+**/.DS_Store
+**/Thumbs.db

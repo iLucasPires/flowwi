@@ -1,0 +1,98 @@
+[project]
+name = "flowwi-api"
+version = "0.1.0"
+description = "flowwi API"
+readme = "README.md"
+requires-python = ">=3.12"
+
+classifiers = [
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
+]
+
+dependencies = [
+  ###########################################################################
+  # CORE
+  ###########################################################################
+  "google-api-python-client>=2.147.0",
+  "google-auth-oauthlib>=1.2.1",
+  "httpx>=0.28.1",
+  "markdown>=3.9",
+  "pillow>=11.3",
+  "pyjwt[crypto]>=2.10.1",
+  "logfire[django,psycopg,redis]>=4.32.1",
+  ###########################################################################
+  # DJANGO CORE
+  ###########################################################################
+  "django>=6.0.1",
+  "django-environ>=0.12",
+  "django-cors-headers>=4.9",
+  "django-filter>=25.2",
+  "django-silky[formatting]>=1.2.0",
+  "django-unfold>=0.90.0",
+  "django-stubs>=5.2.5",
+  "django-allauth[socialaccount]>=65.4",
+  ###########################################################################
+  # DJANGO EXTENSIONS
+  ###########################################################################
+  "django-auditlog>=3.4.1",
+  "django-guardian>=3.3",
+  "django-import-export>=4.3.14",
+  "django-money>=3.5.4",
+  "django-storages[s3]>=1.14.6",
+  ###########################################################################
+  # DJANGO ASYNC / BACKGROUND
+  ###########################################################################
+  "channels[daphne]>=4.3.2",
+  "django-rq>=3.2.2",
+  "django-tasks>=0.11",
+  "django-tasks-rq>=0.12.0",
+  ###########################################################################
+  # DJANGO REST
+  ###########################################################################
+  "djangorestframework>=3.16.1",
+  "djangorestframework-stubs>=3.16.7",
+  "drf-spectacular>=0.28",
+  "drf-standardized-errors>=0.16.0",
+  ###########################################################################
+  # db
+  ###########################################################################
+  "psycopg[binary,pool]>=3.2.10",
+  ###########################################################################
+  # TYPE CHECKING / STUBS
+  ###########################################################################
+  "pydantic-ai-slim[google]>=1.84.0",
+  "pydantic-ai>=1.85.1",
+  "pydantic>=2.13.2",
+  "channels-redis>=4.3.0",
+]
+
+[dependency-groups]
+dev = [
+  ###########################################################################
+  # TESTING / FACTORIES
+  ###########################################################################
+  "factory-boy>=3.3.3",
+  ###########################################################################
+  # LINT / FORMAT
+  ###########################################################################
+  "ruff>=0.15.5",
+  ###########################################################################
+  # GIT HOOKS
+  ###########################################################################
+  "pre-commit>=4.5.1",
+  "pytest>=9.1.1",
+]
+
+
+[tool.ruff]
+target-version = "py312"
+line-length = 120
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["apps", "lib", "config"]

@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head><title>Google Drive</title></head>
+<body>
+<script>
+(function() {
+  var msg = { type: "google-drive-connected", success: {{ success|yesno:"true,false" }} };
+  var origin = "{{ frontend_origin }}";
+  if (window.opener) {
+    window.opener.postMessage(msg, origin);
+  }
+  window.close();
+})();
+</script>
+<p>Você pode fechar esta janela.</p>
+</body>
+</html>
