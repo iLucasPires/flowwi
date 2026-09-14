@@ -185,11 +185,25 @@ class TaskSerializer(ExpandableSerializerModel, serializers.ModelSerializer):
 ### Multi-tenancy
 
 - Todo recurso pertence a um Workplace
-- O frontend envia header `x-workplace-id` em todas as requests
-- `WorkplaceViewSetMixin` (de `apps.domains.workplace.mixins`) extrai o header, valida membership e filtra o queryset
-- Se o user não for membro do workplace → 403 PermissionDenied
-- Se o header não for enviado → queryset vazio (`.none()`)
-- Ao criar recursos, o mixin injeta `workplace` no `serializer.save()`
+- O frontend manda o workplace ativo via cookie `workplace_id` (setado por `WorkplaceViewSet`) ou
+  query param `?workplace_id=` — não é header
+- `WorkplaceViewSetMixin` (de `apps.domains.workplace.mixins`) só resolve e valida (`get_workplace()`/
+  `get_workplace_id()`): se o user não for membro → 403 `PermissionDenied`; se `require_workplace=True`
+  e nada foi enviado → 404 `NotFound`. Ele **não** filtra o queryset nem injeta `workplace` sozinho —
+  cada ViewSet faz isso explicitamente:
+  ```python
+  def get_queryset(self):
+      workplace = self.get_workplace()
+      if workplace is None:
+          return self.queryset.none()
+      return self.queryset.filter(workplace=workplace)
+
+  def perform_create(self, serializer):
+      serializer.save(workplace=self.get_workplace())
+  ```
+- Para recursos aninhados (o workplace não está direto no model), sobrescreva
+  `workplace_lookup_field` com o caminho de lookup (ex.: `"task__workplace"`, `"form__workplace"`) e use
+  `self.queryset.filter(**{self.workplace_lookup_field: workplace})` no `get_queryset()`
 
 ## Autenticação
 

@@ -29,7 +29,9 @@ apps/app/components.d.ts
 .idea/
 .vscode/*
 !.vscode/extensions.json
-.claude/
+apps/*/.claude/
+.claude/*
+!.claude/skills/
 *.suo
 *.ntvs*
 *.njsproj

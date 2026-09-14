@@ -39,6 +39,18 @@ têm convenções específicas de cada stack:
 
 `apps/api/docs/STRUCTURE.md` tem o schema completo do banco de dados (todas as entidades e relações).
 
+## Skills
+
+`.claude/skills/` tem skills do Claude Code com o passo a passo das convenções deste projeto (checadas
+contra o código, não só a doc):
+
+- `flowwi-django-domain` — criar um app de domínio/integração novo no backend (`apps/api`)
+- `flowwi-vue-feature` — criar uma feature/componente novo no frontend (`apps/app`), incluindo o mapa de
+  componentes do Nuxt UI
+
+Já os `.agents/skills` dentro de `apps/app/` são skills de bibliotecas de terceiros (Vue, Pinia, Nuxt UI,
+TanStack) sincronizadas via `skills-lock.json` — não confundir com as skills do projeto acima.
+
 ## Stack resumida
 
 | Camada    | Stack                                                                              |
