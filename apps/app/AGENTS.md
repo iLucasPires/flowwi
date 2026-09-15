@@ -32,7 +32,7 @@ app/
 │   │   │   └── layouts/          # account-layout.vue, dashboard-layout.vue, public-layout.vue
 │   │   ├── features/
 │   │   │   ├── document/
-│   │   │   │   ├── components/       # comment/, editor/, graph/, panel/, preview/, tree/, type/
+│   │   │   │   ├── components/       # comment/, editor/, layout/, panel/, tree/, type/ + soltos (cover, preview, command-palette, graph-modal)
 │   │   │   │   ├── composables/      # document.ts, documentVault.ts, documentEditing.ts...
 │   │   │   │   ├── pages/            # documents.vue
 │   │   │   │   ├── routes.ts         # documentRoutes
@@ -232,6 +232,7 @@ filename.
 | `app/features/task/components/kanban/`  | Subpasta por tipo de visualização                                             |
 | `app/features/settings/components/`     | Subpastas `general/`, `integration/` e `workplace/`                           |
 | `app/shared/components/cover/`          | Seletor de capa reutilizável — usado por document, form, workplace e user     |
+| `app/features/document/components/layout\|panel\|tree/` | Agrupado pelo consumidor real: `layout/` = as 3 estruturas da página (left/center/right-splitter); `panel/` = abas abertas só pelo right-splitter; `tree/` = dialogs/popover abertos só pelo left-splitter. Um arquivo sem irmão de mesmo domínio (`document-cover.vue`, `document-preview.vue`, `document-command-palette.vue`, `document-graph-modal.vue`) fica solto na raiz de `components/` em vez de ganhar uma subpasta de arquivo único |
 
 ## Capas (cover)
 
