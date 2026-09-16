@@ -108,7 +108,14 @@ function updateCategory(category: TaskStatusCategory) {
       <template #content>
         <div class="flex flex-col gap-2 p-2">
           <UColorPicker :model-value="status.color" @update:model-value="updateColor" />
-          <CIconPicker :model-value="status.icon" :color="status.color" size="xs" @update:model-value="updateIcon" />
+          <CIconPicker
+            :model-value="status.icon"
+            :color="status.color"
+            empty-label="Ícone"
+            icon-class="size-4"
+            button-class="w-full justify-center"
+            @update:model-value="updateIcon"
+          />
         </div>
       </template>
     </UPopover>
