@@ -43,9 +43,13 @@ export function useDocumentEditing(activeDoc: ComputedRef<iDocument | undefined>
 
   // Hold the lock for as long as we're actually in editable mode, and only then —
   // browsing an old/published version, or losing edit access mid-session, releases it.
+  // Keyed on `documentId` too (not just `structurallyEditable`) so switching straight
+  // from one editable document to another — e.g. just creating a new one while a draft
+  // was already open — still (re)acquires the lock for the newly active document. A
+  // plain boolean watch would see `true -> true` across that switch and never fire.
   watch(
-    structurallyEditable,
-    (editable) => {
+    [structurallyEditable, documentId],
+    ([editable]) => {
       if (editable) acquireLock()
       else releaseLock()
     },
