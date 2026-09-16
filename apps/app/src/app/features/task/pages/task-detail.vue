@@ -157,6 +157,7 @@ async function onReorderSubtask(id: number, position: string) {
         <CTaskPrioritySelect v-model="state.priority" size="sm" />
         <CTaskTypeSelect v-model="state.type" size="sm" />
         <CTaskMemberSelect v-model="state.assignees" size="sm" />
+        <CTaskDeadlineSelect v-model="state.deadline" size="sm" />
       </div>
 
       <CTaskSubtaskSection

@@ -26,9 +26,13 @@ class TaskViewSet(WorkplaceViewSetMixin, ModelViewSet):
     ordering_fields = ["position", "title", "deadline", "created_at", "priority"]
 
     def get_queryset(self):
+        workplace = self.get_workplace()
+        if workplace is None:
+            return Task.objects.none()
+
         trashed = self.request.query_params.get("trashed", "").lower() == "true"
         return (
-            Task.objects.filter(deleted_at__isnull=not trashed)
+            Task.objects.filter(workplace=workplace, deleted_at__isnull=not trashed)
             .select_related("created_by", "workplace", "status", "type")
             .prefetch_related("assignees", "tags")
             .order_by("status", "position")

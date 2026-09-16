@@ -66,8 +66,8 @@ export const API_TASK_URLS = Object.freeze({
 })
 
 export const API_SUBTASK_URLS = Object.freeze({
-  LIST: `${API_BASE}/tasksubs`,
-  DETAIL: (id: string | number) => `${API_BASE}/tasksubs/${id}`,
+  LIST: `${API_BASE}/subtasks`,
+  DETAIL: (id: string | number) => `${API_BASE}/subtasks/${id}`,
 })
 
 export const API_TASK_TAG_URLS = Object.freeze({

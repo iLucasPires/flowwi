@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { API_ACCOUNT_URLS, apiFetch } from '@/app/core/clients/api'
+import { usePasswordStrength } from '@/app/features/user/composables/password-strength'
 import { useUser } from '@/app/features/user/composables/user'
 import type { tAuthSocialProvider } from '@/app/shared/types/auth'
 import { redirectToProvider } from '@/app/shared/utils/social'
@@ -22,6 +23,8 @@ const loading = ref(false)
 const socialLoading = ref<string | null>(null)
 const showPassword = ref(false)
 const showConfirmPassword = ref(false)
+
+const { strength } = usePasswordStrength(toRef(registerForm, 'password'), toRef(registerForm, 'email'))
 
 async function onRegister() {
   if (registerForm.password !== registerForm.confirmPassword) {
@@ -100,6 +103,16 @@ async function socialLogin(provider: tAuthSocialProvider) {
               />
             </template>
           </UInput>
+          <div v-if="registerForm.password" class="mt-2 flex items-center gap-2">
+            <UProgress
+              :model-value="strength.score"
+              :max="strength.max"
+              :color="strength.color"
+              size="sm"
+              class="flex-1"
+            />
+            <span class="text-xs text-muted">{{ strength.label }}</span>
+          </div>
         </UFormField>
         <UFormField size="sm" label="Confirmar senha">
           <UInput

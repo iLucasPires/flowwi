@@ -22,7 +22,10 @@ class SubTaskViewSet(WorkplaceViewSetMixin, ModelViewSet):
     workplace_lookup_field = "task__workplace"
 
     def get_queryset(self):
-        return SubTask.objects.order_by("position")
+        workplace = self.get_workplace()
+        if workplace is None:
+            return SubTask.objects.none()
+        return SubTask.objects.filter(task__workplace=workplace).order_by("position")
 
     def perform_create(self, serializer):
         task = serializer.validated_data["task"]

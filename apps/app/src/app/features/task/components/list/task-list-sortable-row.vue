@@ -67,13 +67,7 @@ const contextMenuItems = computed(() => [
       <CTaskDeadlineChip :deadline="task.deadline" class="w-20" />
 
       <UAvatarGroup v-if="task.assignees?.length" size="3xs" :max="1">
-        <UAvatar
-          v-for="assignee in task.assignees"
-          :key="assignee.id"
-          :src="assignee.profile?.photo || ''"
-          :alt="assignee.profile?.full_name"
-          icon="i-lucide-user"
-        />
+        <CMemberAvatar v-for="assignee in task.assignees" :key="assignee.id" :member="assignee" />
       </UAvatarGroup>
     </div>
   </UContextMenu>

@@ -79,9 +79,8 @@ const columns: TableColumn<iWorkplaceMember>[] = [
     header: 'Usuário',
     cell: ({ row }) =>
       h('div', { class: 'flex items-center gap-3' }, [
-        h(resolveComponent('UAvatar'), {
-          src: row.original.profile?.photo ?? undefined,
-          alt: row.original.profile?.full_name ?? row.original.profile?.email ?? 'Avatar',
+        h(resolveComponent('CMemberAvatar'), {
+          member: row.original,
           size: 'sm',
         }),
         h('div', undefined, [
