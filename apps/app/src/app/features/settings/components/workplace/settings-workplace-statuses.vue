@@ -6,23 +6,25 @@ import type { DragEndEvent } from '@dnd-kit/vue'
 import { DragDropProvider } from '@dnd-kit/vue'
 import { isSortable } from '@dnd-kit/vue/sortable'
 
-const overlay = useOverlay()
-const { statuses, deleteStatus, reorderStatus } = useTaskStatus()
+const { statuses, createStatus, updateStatus, deleteStatus, reorderStatus } = useTaskStatus()
 
-function openCreate() {
-  const component = resolveComponent('CTaskStatusEditDialog')
-  if (typeof component === 'object') {
-    const modal = overlay.create(component)
-    modal.open()
-  }
+/** The status that should open straight into rename mode — set right after creating
+ * one, cleared once its row has consumed the signal. Same one-shot pattern as
+ * Linear's "new label" row appearing already editable. */
+const autoEditId = ref<number | null>(null)
+
+async function addStatus() {
+  const created = await createStatus({
+    name: 'Novo status',
+    color: '#a3a3a3',
+    icon: '',
+    category: 'todo',
+  })
+  autoEditId.value = created.id
 }
 
-function openEdit(status: iTaskStatus) {
-  const component = resolveComponent('CTaskStatusEditDialog')
-  if (typeof component === 'object') {
-    const modal = overlay.create(component, { props: { status } })
-    modal.open()
-  }
+async function onUpdate(status: iTaskStatus, data: Partial<iTaskStatus>) {
+  await updateStatus({ id: status.id, data })
 }
 
 async function onDelete(status: iTaskStatus) {
@@ -56,7 +58,7 @@ function onDragEnd(event: DragEndEvent) {
         </p>
       </div>
 
-      <UButton label="Novo status" icon="i-lucide-plus" size="sm" @click="openCreate" />
+      <UButton label="Novo status" icon="i-lucide-plus" size="sm" @click="addStatus" />
     </div>
 
     <DragDropProvider @drag-end="onDragEnd">
@@ -66,8 +68,10 @@ function onDragEnd(event: DragEndEvent) {
           :key="status.id"
           :status="status"
           :index="index"
-          @edit="openEdit"
+          :auto-edit="status.id === autoEditId"
+          @update="onUpdate"
           @delete="onDelete"
+          @auto-edit-done="autoEditId = null"
         />
       </ul>
     </DragDropProvider>
