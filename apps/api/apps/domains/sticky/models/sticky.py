@@ -33,6 +33,16 @@ class Sticky(
         help_text=_("User who created this sticky."),
     )
 
+    deleted_by = models.ForeignKey(
+        to=User,
+        related_name="deleted_stickies",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        verbose_name=_("deleted by"),
+        help_text=_("User who deleted this sticky."),
+    )
+
     visibility = models.CharField(
         max_length=20,
         choices=StickyVisibility.choices,

@@ -1,3 +1,4 @@
+from django.contrib.auth import get_user_model
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
@@ -7,6 +8,8 @@ from lib.models import TimeStampedSoftDeleteModel, UUIDModel
 from .status import TaskStatus
 from .tag import TaskTag
 from .type import TaskType
+
+User = get_user_model()
 
 
 class TaskPriority(models.TextChoices):
@@ -107,6 +110,16 @@ class Task(TimeStampedSoftDeleteModel, UUIDModel):
         blank=True,
         verbose_name=_("assignees"),
         help_text=_("Users responsible for executing this task."),
+    )
+
+    deleted_by = models.ForeignKey(
+        to=User,
+        related_name="deleted_tasks",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        verbose_name=_("deleted by"),
+        help_text=_("User who deleted the task."),
     )
 
     workplace = models.ForeignKey(

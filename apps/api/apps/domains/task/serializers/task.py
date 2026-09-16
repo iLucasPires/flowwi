@@ -41,6 +41,8 @@ class TaskSerializer(ExpandableSerializerModel, serializers.ModelSerializer):
             "tags",
             "created_at",
             "updated_at",
+            "deleted_at",
+            "deleted_by",
         ]
         read_only_fields = [
             "workplace",
@@ -48,6 +50,8 @@ class TaskSerializer(ExpandableSerializerModel, serializers.ModelSerializer):
             "created_at",
             "updated_at",
             "completed_at",
+            "deleted_at",
+            "deleted_by",
         ]
 
     def create(self, validated_data):

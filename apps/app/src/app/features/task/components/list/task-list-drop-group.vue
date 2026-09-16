@@ -28,7 +28,7 @@ useDroppable({
       :task="task"
       :index="index"
       :group="status"
-      @click="emit('open', task)"
+      @select="emit('open', task)"
     />
   </div>
 </template>

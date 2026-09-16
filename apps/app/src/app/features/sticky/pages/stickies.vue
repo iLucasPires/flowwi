@@ -74,8 +74,6 @@ function onDragEnd(event: DragEndEvent) {
     <template #actions>
       <CStickyFilterDropdown v-model:visibility="filterVisibility" />
 
-      <CStickyTrashSlideover />
-
       <UButton
         label="Nova sticky"
         icon="i-lucide-plus"

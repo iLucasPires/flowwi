@@ -16,6 +16,8 @@ class StickySerializer(serializers.ModelSerializer):
             "position",
             "created_at",
             "updated_at",
+            "deleted_at",
+            "deleted_by",
         ]
         read_only_fields = [
             "workplace",
@@ -23,4 +25,6 @@ class StickySerializer(serializers.ModelSerializer):
             "position",
             "created_at",
             "updated_at",
+            "deleted_at",
+            "deleted_by",
         ]

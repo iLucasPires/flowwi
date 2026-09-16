@@ -29,7 +29,7 @@ export const useTask = () => {
     queryKey: taskKeys.list(),
     staleTime: 30_000,
     queryFn: () =>
-      apiFetch<iPaginationNumber<iTask>>(`${API_TASK_URLS.LIST}?expand=assignees,profile`),
+      apiFetch<iPaginationNumber<iTask>>(`${API_TASK_URLS.LIST}?expand=assignees,profile&page_size=100`),
   })
 
   /**

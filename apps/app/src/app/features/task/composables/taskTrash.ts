@@ -24,7 +24,8 @@ export const useTrashedTasks = () => {
   } = useQuery({
     queryKey: trashedTaskKey,
     staleTime: 15_000,
-    queryFn: () => apiFetch<iPaginationNumber<iTask>>(`${API_TASK_URLS.LIST}?trashed=true`),
+    queryFn: () =>
+      apiFetch<iPaginationNumber<iTask>>(`${API_TASK_URLS.LIST}?trashed=true&page_size=100`),
   })
 
   const trashedTasks = computed(() => data.value?.results ?? [])

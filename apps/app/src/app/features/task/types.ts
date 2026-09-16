@@ -54,6 +54,8 @@ export interface iTask {
   origin: string
   deadline: string | null
   completed_at: string | null
+  deleted_at: string | null
+  deleted_by: number | null
   created_by: number | null
   assignees: iWorkplaceMember[]
   tags: iTag[]

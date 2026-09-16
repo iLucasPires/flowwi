@@ -11,6 +11,7 @@ const tabs: Record<string, ReturnType<typeof resolveComponent>> = {
   notifications: resolveComponent('CSettingsGeneralNotifications'),
   workspace: resolveComponent('CSettingsWorkplace'),
   members: resolveComponent('CSettingsWorkplaceMembers'),
+  trash: resolveComponent('CTrashPanel'),
   taskStatuses: resolveComponent('CSettingsWorkplaceStatuses'),
   taskTypes: resolveComponent('CSettingsWorkplaceTypes'),
   documentTypes: resolveComponent('CSettingsWorkplaceDocumentTypes'),
@@ -54,6 +55,12 @@ const navItems = computed<NavigationMenuItem[][]>(() => [
       icon: 'i-lucide-users',
       onSelect: () => (activeTab.value = 'members'),
       active: activeTab.value === 'members',
+    },
+    {
+      label: 'Lixeira',
+      icon: 'i-lucide-trash-2',
+      onSelect: () => (activeTab.value = 'trash'),
+      active: activeTab.value === 'trash',
     },
   ],
   [

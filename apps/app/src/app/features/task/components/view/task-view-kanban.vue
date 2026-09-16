@@ -59,7 +59,7 @@ const columns = computed(() =>
 
 <template>
   <DragDropProvider @drag-end="onDragEnd">
-    <div class="flex-1 flex gap-5 overflow-x-auto overflow-y-hidden pb-1">
+    <div class="flex-1 flex gap-5 overflow-x-auto overflow-y-hidden pb-1 scrollbar-hide">
       <CTaskKanbanColumn
         v-for="column in columns"
         :key="column.key"

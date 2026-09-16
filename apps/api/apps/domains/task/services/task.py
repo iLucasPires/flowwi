@@ -11,12 +11,14 @@ class TaskService(ServiceBase):
 
     def trash(self, task: Task, *, deleted_by=None) -> Task:
         task.deleted_at = timezone.now()
-        task.save(update_fields=["deleted_at", "updated_at"])
+        task.deleted_by = deleted_by
+        task.save(update_fields=["deleted_at", "deleted_by", "updated_at"])
         return task
 
     def restore(self, task: Task) -> Task:
         task.deleted_at = None
-        task.save(update_fields=["deleted_at", "updated_at"])
+        task.deleted_by = None
+        task.save(update_fields=["deleted_at", "deleted_by", "updated_at"])
         return task
 
     def purge(self, task: Task) -> None:

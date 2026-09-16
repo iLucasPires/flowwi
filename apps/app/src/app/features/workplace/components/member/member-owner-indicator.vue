@@ -1,11 +1,16 @@
 <script setup lang="ts">
 import { useUser } from '@/app/features/user/composables/user'
 import { useWorkplaceMember } from '@/app/features/workplace/composables/workplaceMember'
-const props = defineProps<{
-  userId: number | null
-  /** Avatar/badge only, no name — for tight spaces like a sticky card footer. */
-  compact?: boolean
-}>()
+const props = withDefaults(
+  defineProps<{
+    userId: number | null
+    /** Avatar/badge only, no name — for tight spaces like a sticky card footer. */
+    compact?: boolean
+    /** Verb used in the tooltip, e.g. "Criado por" or "Excluído por". */
+    label?: string
+  }>(),
+  { label: 'Criado por' },
+)
 
 const { user } = useUser()
 const { members } = useWorkplaceMember()
@@ -20,7 +25,7 @@ const displayName = computed(() => {
 })
 
 const tooltipText = computed(() =>
-  isMe.value ? 'Criado por você' : `Criado por ${displayName.value}`,
+  isMe.value ? `${props.label} você` : `${props.label} ${displayName.value}`,
 )
 
 defineOptions({ name: 'MemberOwnerIndicator' })
