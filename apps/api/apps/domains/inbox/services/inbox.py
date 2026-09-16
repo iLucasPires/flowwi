@@ -2,7 +2,6 @@ from django.db.models import QuerySet
 
 from apps.domains.workplace.models import WorkplaceMember
 from lib.bases import ServiceBase
-from lib.utils import channel_name as build_channel_name
 
 from ..models import Inbox
 
@@ -10,13 +9,6 @@ from ..models import Inbox
 class InboxService(ServiceBase):
     def __init__(self):
         super().__init__(model=Inbox)
-
-    @staticmethod
-    def channel_name(member_id) -> str:
-        """Single source of truth for the member's SSE channel name (see
-        `apps.common.streaming`) — used by both the `sse` action and the `post_save`
-        signal, so the two can never drift apart."""
-        return build_channel_name("member", member_id)
 
     @staticmethod
     def build_inbox_payload(inbox: Inbox) -> dict:

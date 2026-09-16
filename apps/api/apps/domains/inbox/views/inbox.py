@@ -8,6 +8,7 @@ from apps.common.streaming.views import sse_response
 from apps.domains.workplace.mixins import WorkplaceViewSetMixin
 from lib.paginations import LargeResultsSetPagination
 from lib.renderers import SSERenderer
+from lib.utils import channel_name
 
 from ..models import Inbox
 from ..selectors import InboxSelector
@@ -97,6 +98,7 @@ class InboxViewSet(
         renderer_classes=[SSERenderer],
     )
     def sse(self, request):
-        member = self.get_member()
-
-        return sse_response(InboxService.channel_name(member.id))
+        # Keyed by the stable User.id, not the active WorkplaceMember.id, so the
+        # connection keeps receiving notifications even if the user switches their
+        # active workplace mid-session — see `apps.domains.inbox.signals`.
+        return sse_response(channel_name("user", request.user.id))
