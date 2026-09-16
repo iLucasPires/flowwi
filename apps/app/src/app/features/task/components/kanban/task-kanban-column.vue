@@ -38,7 +38,7 @@ useDroppable({
       <span class="text-xs text-muted tabular-nums">{{ tasks.length }}</span>
     </header>
 
-    <main class="flex-1 overflow-y-auto pt-2.5">
+    <main class="flex-1 overflow-y-auto pt-2.5 scrollbar-hide">
       <ul class="space-y-2">
         <CTaskKanbanSortableCard
           v-for="(task, index) in tasks"

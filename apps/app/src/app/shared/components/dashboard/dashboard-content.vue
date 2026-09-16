@@ -1,13 +1,14 @@
 <script setup lang="ts">
 defineProps<{
-  title: string
-  description?: string
-  size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl'
-}>()
+  title: string;
+  description?: string;
+  size?: "xs" | "sm" | "md" | "lg" | "xl";
+}>();
 </script>
 
 <template>
   <UCard
+    variant="subtle"
     :ui="{
       root: 'size-full flex flex-col overflow-hidden',
       body: 'flex-1 overflow-auto p-1',

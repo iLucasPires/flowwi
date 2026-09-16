@@ -9,6 +9,7 @@ from rest_framework.viewsets import ModelViewSet
 
 from apps.domains.workplace.mixins import WorkplaceViewSetMixin
 from apps.domains.workplace.permissions import IsDesignerOrReadOnly
+from lib.paginations import LargeResultsSetPagination
 
 from ..models import Task, TaskStatus, TaskStatusCategory
 from ..serializers import TaskSerializer
@@ -20,6 +21,7 @@ class TaskViewSet(WorkplaceViewSetMixin, ModelViewSet):
     queryset = Task.objects.all()
     serializer_class = TaskSerializer
     permission_classes = [IsAuthenticated, IsDesignerOrReadOnly]
+    pagination_class = LargeResultsSetPagination
     lookup_field = "public_id"
 
     search_fields = ["title", "description"]

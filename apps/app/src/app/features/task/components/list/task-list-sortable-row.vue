@@ -12,6 +12,10 @@ const props = defineProps<{
   group: number
 }>()
 
+const emit = defineEmits<{
+  select: []
+}>()
+
 const { deleteTask } = useTask()
 const { statuses } = useTaskStatus()
 
@@ -44,31 +48,32 @@ const contextMenuItems = computed(() => [
 </script>
 
 <template>
-  <UContextMenu :items="contextMenuItems" size="sm">
-    <div
-      ref="elementRef"
-      class="flex items-center gap-3 px-2 py-2 rounded-lg hover:bg-neutral-200/60 dark:hover:bg-neutral-800/60 cursor-grab active:cursor-grabbing transition-colors"
-      :class="{ 'opacity-50': isDragSource }"
-    >
-      <UIcon
-        :name="priorityMeta?.icon ?? 'i-lucide-minus'"
-        class="size-3.5 shrink-0"
-        :class="priorityMeta?.color"
-      />
-      <span
-        class="flex-1 text-sm text-neutral-800 dark:text-neutral-200 truncate min-w-0"
-        :class="isDoneOrCancelled ? 'line-through text-neutral-500' : ''"
+  <div ref="elementRef" class="cursor-grab active:cursor-grabbing" :class="{ 'opacity-50': isDragSource }">
+    <UContextMenu :items="contextMenuItems" size="sm">
+      <div
+        class="flex items-center gap-3 px-2 py-2 rounded-lg hover:bg-neutral-200/60 dark:hover:bg-neutral-800/60 transition-colors"
+        @click="emit('select')"
       >
-        {{ task.title }}
-      </span>
+        <UIcon
+          :name="priorityMeta?.icon ?? 'i-lucide-minus'"
+          class="size-3.5 shrink-0"
+          :class="priorityMeta?.color"
+        />
+        <span
+          class="flex-1 text-sm text-neutral-800 dark:text-neutral-200 truncate min-w-0"
+          :class="isDoneOrCancelled ? 'line-through text-neutral-500' : ''"
+        >
+          {{ task.title }}
+        </span>
 
-      <CTaskTypeBadge :type="task.type" />
-      <CTaskSubtaskCountChip :subs="task.subs" />
-      <CTaskDeadlineChip :deadline="task.deadline" class="w-20" />
+        <CTaskTypeBadge :type="task.type" />
+        <CTaskSubtaskCountChip :subs="task.subs" />
+        <CTaskDeadlineChip :deadline="task.deadline" class="w-20" />
 
-      <UAvatarGroup v-if="task.assignees?.length" size="3xs" :max="1">
-        <CMemberAvatar v-for="assignee in task.assignees" :key="assignee.id" :member="assignee" />
-      </UAvatarGroup>
-    </div>
-  </UContextMenu>
+        <UAvatarGroup v-if="task.assignees?.length" size="3xs" :max="1">
+          <CMemberAvatar v-for="assignee in task.assignees" :key="assignee.id" :member="assignee" />
+        </UAvatarGroup>
+      </div>
+    </UContextMenu>
+  </div>
 </template>

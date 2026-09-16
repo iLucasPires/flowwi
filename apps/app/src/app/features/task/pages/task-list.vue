@@ -98,8 +98,6 @@ function openTask(task: iTask | { public_id: string }) {
       <UTabs v-model="groupTab" :items="groupItems" size="xs" :content="false" />
       <UTabs v-model="viewTab" :items="viewItems" size="xs" :content="false" />
 
-      <CTaskTrashSlideover />
-
       <UButton label="Nova tarefa" icon="i-lucide-plus" size="xs" @click="openCreate" />
     </template>
 

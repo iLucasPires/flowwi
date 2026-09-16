@@ -5,6 +5,7 @@ import { useTaskDetail } from '@/app/features/task/composables/taskDetail'
 import type { TaskUpdateSchema } from '@/app/features/task/schemas'
 import type { iSub } from '@/app/features/task/types'
 import { CalendarDate, parseDate } from '@internationalized/date'
+import type { BreadcrumbItem } from '@nuxt/ui'
 
 defineOptions({ name: 'TaskDetailPage' })
 
@@ -33,6 +34,14 @@ const showSkeleton = computed(() => {
   if (taskId.value == null) return false
   if (isLoading.value) return true
   return taskData.value == null
+})
+
+const breadcrumbItems = computed<BreadcrumbItem[]>(() => {
+  const items: BreadcrumbItem[] = [
+    { label: 'Tarefas', icon: 'i-lucide-kanban', to: '/dashboard/tasks' },
+  ]
+  if (taskData.value) items.push({ label: taskData.value.title || 'Sem título' })
+  return items
 })
 
 const state = reactive<TaskUpdateSchema>({
@@ -125,7 +134,11 @@ async function onReorderSubtask(id: number, position: string) {
 </script>
 
 <template>
-  <div class="size-full overflow-y-auto">
+  <CDashboardContent title="">
+    <template #leading>
+      <UBreadcrumb :items="breadcrumbItems" />
+    </template>
+
     <CTaskDetailSkeleton v-if="showSkeleton" />
 
     <UEmpty
@@ -138,7 +151,7 @@ async function onReorderSubtask(id: number, position: string) {
       size="sm"
     />
 
-    <div v-else class="flex flex-col gap-8 h-full w-1/2 mx-auto py-8">
+    <div v-else class="flex flex-col gap-8 w-1/2 mx-auto py-8">
       <!-- Main content -->
       <UInput
         v-model="state.title"
@@ -168,5 +181,5 @@ async function onReorderSubtask(id: number, position: string) {
         @reorder="onReorderSubtask"
       />
     </div>
-  </div>
+  </CDashboardContent>
 </template>
