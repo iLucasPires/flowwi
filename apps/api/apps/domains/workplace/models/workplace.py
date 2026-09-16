@@ -89,6 +89,13 @@ class Workplace(
             user=user,
         ).exists()
 
+    def is_admin(self, user: User) -> bool:
+        """Owners and managers both act as workplace admins."""
+        return self.members.filter(
+            role__in=("owner", "manager"),
+            user=user,
+        ).exists()
+
     @property
     def storage_percent_used(self) -> float:
         try:

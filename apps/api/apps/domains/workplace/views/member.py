@@ -4,6 +4,7 @@ from rest_framework.permissions import IsAuthenticated
 
 from ..mixins import WorkplaceViewSetMixin
 from ..models import WorkplaceMember
+from ..permissions import IsWorkplaceAdminToManageMembers
 from ..serializers import WorkplaceMemberSerializer
 
 
@@ -14,7 +15,7 @@ class WorkplaceMemberViewSet(
 ):
     queryset = WorkplaceMember.objects.select_related("user").prefetch_related("user__profile")
     serializer_class = WorkplaceMemberSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsWorkplaceAdminToManageMembers]
     lookup_field = "public_id"
     require_workplace = True
     search_fields = [

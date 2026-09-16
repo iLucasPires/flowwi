@@ -1,4 +1,5 @@
 import { API_WORKPLACE_MEMBER_URLS, apiFetch } from '@/app/core/clients/api'
+import { useUser } from '@/app/features/user/composables/user'
 import { useWorkplace } from '@/app/features/workplace/composables/workplace'
 import type { WorkplaceRole, iWorkplaceMember } from '@/app/features/workplace/types'
 import type { iPaginationNumber } from '@/app/shared/types/pagination'
@@ -15,6 +16,7 @@ export const workplaceMemberKeys = {
 
 export const useWorkplaceMember = () => {
   const toast = useToast()
+  const { user } = useUser()
   const { workplace } = useWorkplace()
   const queryClient = useQueryClient()
 
@@ -36,11 +38,11 @@ export const useWorkplaceMember = () => {
 
   const members = computed(() => data.value?.results ?? [])
 
-  const myMember = computed(() =>
-    members.value.find((m) => m.workplace?.id === workplace.value?.id),
-  )
+  const myMember = computed(() => members.value.find((m) => m.user === user.value?.id))
 
   const myRole = computed<WorkplaceRole | null>(() => myMember.value?.role ?? null)
+
+  const isAdmin = computed(() => myRole.value === 'owner' || myRole.value === 'manager')
 
   const { mutateAsync: addMember, status: addStatus } = useMutation({
     mutationFn: (vars: { user: string; role: WorkplaceRole }) =>
@@ -80,6 +82,7 @@ export const useWorkplaceMember = () => {
     members,
     myMember,
     myRole,
+    isAdmin,
     isLoading,
     refresh,
     addMember,
