@@ -63,35 +63,38 @@ defineOptions({ name: 'DocumentPanelComment' })
 
     <USeparator class="my-0.5" />
 
-    <div v-if="comments.length" class="flex flex-col gap-2 max-h-72 overflow-y-auto pr-0.5">
+    <div v-if="comments.length" class="flex flex-col gap-1 max-h-72 overflow-y-auto pr-0.5">
       <div
         v-for="comment in comments"
         :key="comment.id"
-        class="flex flex-col gap-1.5 p-2.5 rounded-lg bg-elevated/40 hover:bg-elevated/70 border border-default/50 transition-colors"
+        class="flex flex-col gap-1 px-2.5 py-2 rounded-md bg-elevated"
       >
-        <div v-if="comment.quote" class="flex items-center gap-1.5 min-w-0">
-          <UIcon name="i-lucide-quote" class="size-3 shrink-0 text-primary" />
-          <span class="text-[11px] font-mono text-dimmed truncate">
-            "{{ truncate(comment.quote, 36) }}"
+        <div class="flex items-center justify-between gap-2">
+          <div class="flex items-center gap-1.5 min-w-0">
+            <template v-if="comment.quote">
+              <UIcon name="i-lucide-quote" class="size-3 shrink-0 text-primary" />
+              <span class="text-[11px] font-mono text-dimmed truncate">
+                "{{ truncate(comment.quote, 32) }}"
+              </span>
+            </template>
+            <UBadge
+              v-else
+              label="Geral"
+              size="xs"
+              variant="subtle"
+              color="neutral"
+              class="text-[9px] px-1 py-0 h-3.5 leading-none"
+            />
+          </div>
+
+          <span class="text-[10.5px] text-dimmed shrink-0">
+            {{ timeAgoLabel(comment.created_at) }}
           </span>
-        </div>
-        <div v-else class="flex items-center gap-1.5">
-          <UBadge
-            label="Geral"
-            size="xs"
-            variant="subtle"
-            color="neutral"
-            class="text-[9px] px-1 py-0 h-3.5 leading-none"
-          />
         </div>
 
         <p class="text-xs text-default leading-relaxed whitespace-pre-wrap">
           {{ comment.content }}
         </p>
-
-        <span class="text-[10px] text-dimmed self-end">
-          {{ timeAgoLabel(comment.created_at) }}
-        </span>
       </div>
     </div>
 
@@ -108,33 +111,36 @@ defineOptions({ name: 'DocumentPanelComment' })
 
     <div
       v-if="!canComment"
-      class="flex items-center gap-2 p-2 rounded-md bg-elevated/30 text-dimmed text-xs"
+      class="flex items-center gap-2 px-2.5 py-2 rounded-md bg-elevated text-dimmed text-[11px]"
     >
       <UIcon name="i-lucide-lock" class="size-3.5 shrink-0" />
       <span>Publique o documento para comentar.</span>
     </div>
 
-    <div v-else class="flex flex-col gap-2">
-      <UTextarea
-        :model-value="generalDraft"
-        :rows="2"
-        autoresize
-        placeholder="Adicionar um comentário geral..."
-        variant="subtle"
-        size="xs"
-        class="w-full"
-        @update:model-value="emit('update:generalDraft', String($event))"
-      />
-      <UButton
-        label="Comentar"
-        icon="i-lucide-send"
-        size="xs"
-        color="primary"
-        class="self-end"
-        :disabled="!generalDraft.trim()"
-        :loading="submittingGeneral"
-        @click="emit('submitGeneral')"
-      />
+    <div v-else class="flex flex-col gap-1.5">
+      <span class="text-[11px] font-medium text-dimmed px-0.5">Novo comentário</span>
+      <div class="flex flex-col gap-2">
+        <UTextarea
+          :model-value="generalDraft"
+          :rows="2"
+          autoresize
+          placeholder="Adicionar um comentário geral..."
+          variant="subtle"
+          size="xs"
+          class="w-full"
+          @update:model-value="emit('update:generalDraft', String($event))"
+        />
+        <UButton
+          label="Comentar"
+          icon="i-lucide-send"
+          size="xs"
+          color="primary"
+          class="self-end"
+          :disabled="!generalDraft.trim()"
+          :loading="submittingGeneral"
+          @click="emit('submitGeneral')"
+        />
+      </div>
     </div>
   </div>
 </template>

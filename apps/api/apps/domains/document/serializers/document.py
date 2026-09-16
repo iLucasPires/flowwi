@@ -13,7 +13,7 @@ class DocumentSerializer(serializers.ModelSerializer):
     class DocumentNestedVersionSerializer(serializers.ModelSerializer):
         class Meta:
             model = DocumentVersion
-            fields = ["id", "document", "number", "content", "created_at"]
+            fields = ["id", "document", "number", "content", "status", "created_at"]
             read_only_fields = ["created_at"]
 
     class DocumentNestedFeedbackSerializer(serializers.ModelSerializer):

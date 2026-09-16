@@ -85,7 +85,7 @@ defineOptions({ name: 'DocumentRightPanel' })
       </UTooltip>
 
       <template #content>
-        <div class="w-80 max-h-96 overflow-y-auto p-3">
+        <div class="w-80 p-3">
           <CDocumentPanelComment
             :comments="comments"
             :can-comment="canComment"
@@ -105,7 +105,7 @@ defineOptions({ name: 'DocumentRightPanel' })
       </UTooltip>
 
       <template #content>
-        <div class="w-72 max-h-96 overflow-y-auto p-3">
+        <div class="w-80 p-3">
           <CDocumentPanelVersion
             :versions="versions"
             :active-index="activeIndex"

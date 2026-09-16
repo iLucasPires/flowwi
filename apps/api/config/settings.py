@@ -291,7 +291,14 @@ CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {
-            "hosts": [REDIS_URL],
+            # `channels_redis` long-polls for new messages with a 5s BZPOPMIN
+            # (`RedisChannelLayer.brpop_timeout`). redis-py's own client-side
+            # `socket_timeout` now defaults to 5s too (`DEFAULT_SOCKET_TIMEOUT`),
+            # so the two races every cycle and the client-side timeout usually
+            # wins, raising `redis.exceptions.TimeoutError` and killing every
+            # WebSocket connection roughly every 5 seconds. Set a socket timeout
+            # comfortably above 5s so the server's own nil reply always wins.
+            "hosts": [{"address": REDIS_URL, "socket_timeout": 20}],
         },
     }
 }

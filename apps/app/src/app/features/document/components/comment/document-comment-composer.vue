@@ -12,7 +12,7 @@ const emit = defineEmits<{
   submit: [{ quote: string; content: string }]
 }>()
 
-/** Minimum space needed above the selection to place the toolbar there instead of below. */
+/** Minimum space needed above the selection to place the trigger there instead of below. */
 const TOOLBAR_CLEARANCE = 48
 const GAP = 8
 const EDGE_PADDING = 12
@@ -23,7 +23,9 @@ const text = ref('')
 
 const placeAbove = computed(() => props.selection.top > TOOLBAR_CLEARANCE)
 
-/** Centered on the selection, clamped so the toolbar never spills past the viewport edge. */
+/** Centered on the selection, clamped so the floating trigger never spills past the
+ * viewport edge — the popover content itself doesn't need this, Floating UI's own
+ * collision handling (`collisionPadding`, defaulted by `UPopover`) takes care of it. */
 const clampedCenterX = computed(() => {
   if (typeof window === 'undefined') return props.selection.centerX
 
@@ -35,6 +37,28 @@ const triggerStyle = computed(() => ({
   top: placeAbove.value ? `${props.selection.top - GAP}px` : `${props.selection.bottom + GAP}px`,
   transform: placeAbove.value ? 'translate(-50%, -100%)' : 'translate(-50%, 0)',
 }))
+
+// `UPopover` positions its content off a real trigger element by default — this
+// composer has none (the trigger button below is a plain floating affordance, not a
+// Reka-managed anchor). `reference` is Nuxt UI/Floating UI's documented escape hatch
+// for exactly this: anchor to a virtual element (anything with
+// `getBoundingClientRect`) instead. Content is portaled to `<body>` by default too,
+// so it's immune to any ancestor stacking context the editor layout might create.
+const virtualReference = computed(() => {
+  const { top, bottom, centerX } = props.selection
+  return {
+    getBoundingClientRect: () => ({
+      x: centerX,
+      y: top,
+      top,
+      bottom,
+      left: centerX,
+      right: centerX,
+      width: 0,
+      height: bottom - top,
+    }),
+  }
+})
 
 function setOpen(value: boolean) {
   open.value = value
@@ -53,66 +77,59 @@ async function submit() {
 </script>
 
 <template>
-  <Transition
-    enter-active-class="transition duration-150 ease-out"
-    enter-from-class="opacity-0 scale-95"
-    enter-to-class="opacity-100 scale-100"
-    leave-active-class="transition duration-100 ease-in"
-    leave-from-class="opacity-100 scale-100"
-    leave-to-class="opacity-0 scale-95"
-  >
-    <UPopover
-      :open="open"
-      :content="{ side: placeAbove ? 'top' : 'bottom', align: 'center', sideOffset: 6 }"
-      @update:open="setOpen"
-    >
-      <UButton
-        label="Comentar"
-        icon="i-lucide-message-square-plus"
-        size="xs"
-        variant="subtle"
-        color="neutral"
-        class="fixed z-40 backdrop-blur-md bg-default/90 hover:bg-default text-highlighted shadow-lg rounded-full origin-bottom"
-        :style="triggerStyle"
-        @mousedown.prevent="setOpen(true)"
-      />
+  <UButton
+    v-if="!open"
+    label="Comentar"
+    icon="i-lucide-message-square-plus"
+    size="xs"
+    variant="subtle"
+    color="neutral"
+    class="fixed z-40 backdrop-blur-md bg-default/90 hover:bg-default text-highlighted shadow-lg rounded-full origin-bottom"
+    :style="triggerStyle"
+    @mousedown.prevent="setOpen(true)"
+  />
 
-      <template #content>
-        <div class="w-72 p-2.5 flex flex-col gap-2">
-          <span
-            class="text-[11px] text-primary bg-primary/10 rounded px-1.5 py-0.5 self-start max-w-full truncate"
-          >
-            "{{ quote }}"
-          </span>
-          <UTextarea
-            v-model="text"
-            :rows="2"
-            autoresize
-            autofocus
-            placeholder="O que precisa ajustar aqui?"
-            variant="subtle"
+  <UPopover
+    :open="open"
+    :reference="virtualReference"
+    :content="{ side: placeAbove ? 'top' : 'bottom', align: 'center', sideOffset: 6 }"
+    @update:open="setOpen"
+  >
+    <template #content>
+      <div class="w-72 p-2.5 flex flex-col gap-2">
+        <span
+          class="text-[11px] text-primary bg-primary/10 rounded px-1.5 py-0.5 self-start max-w-full truncate"
+        >
+          "{{ quote }}"
+        </span>
+        <UTextarea
+          v-model="text"
+          :rows="2"
+          autoresize
+          autofocus
+          placeholder="O que precisa ajustar aqui?"
+          variant="subtle"
+          size="xs"
+          class="w-full"
+          @keydown.enter.exact.prevent="submit"
+        />
+        <div class="flex justify-end gap-1.5">
+          <UButton
+            label="Cancelar"
+            variant="ghost"
+            color="neutral"
             size="xs"
-            class="w-full"
-            @keydown.enter.exact.prevent="submit"
+            @click="setOpen(false)"
           />
-          <div class="flex justify-end gap-1.5">
-            <UButton
-              label="Cancelar"
-              variant="ghost"
-              color="neutral"
-              size="xs"
-              @click="setOpen(false)"
-            />
-            <UButton
-              label="Comentar"
-              size="xs"
-              :disabled="!text.trim()"
-              :loading="submitting"
-              @click="submit"
-            />
-          </div>
+          <UButton
+            label="Comentar"
+            size="xs"
+            :disabled="!text.trim()"
+            :loading="submitting"
+            @click="submit"
+          />
         </div>
-      </template>
-    </UPopover>
-  </Transition>
+      </div>
+    </template>
+  </UPopover>
 </template>

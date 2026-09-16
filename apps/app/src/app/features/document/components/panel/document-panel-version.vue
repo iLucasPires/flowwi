@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { iDocumentVersion, iDocumentVersionStatus } from '@/app/features/document/types'
-defineProps<{
+const props = defineProps<{
   versions: iDocumentVersion[]
   activeIndex: number
 }>()
@@ -10,6 +10,13 @@ const emit = defineEmits<{
   newRevision: []
   setStatus: [status: iDocumentVersionStatus]
 }>()
+
+const activeVersion = computed(() => props.versions[props.activeIndex])
+const isPublished = computed(() => activeVersion.value?.status === 'published')
+
+function togglePublished(value: boolean) {
+  emit('setStatus', value ? 'published' : 'draft')
+}
 
 function timeAgoLabel(iso: string) {
   const diffMs = Date.now() - new Date(iso).getTime()
@@ -46,7 +53,7 @@ defineOptions({
 </script>
 
 <template>
-  <div class="flex flex-col gap-2">
+  <div class="flex flex-col gap-2.5">
     <div class="flex items-center justify-between px-0.5">
       <div class="flex items-center gap-1.5">
         <UIcon name="i-lucide-history" class="size-3.5 text-muted" />
@@ -74,92 +81,80 @@ defineOptions({
 
     <USeparator class="my-0.5" />
 
-    <div v-if="versions.length" class="flex flex-col gap-0.5 max-h-80 overflow-y-auto">
-      <UTooltip
-        v-for="(version, index) in versions"
-        :key="version.id"
-        :text="formatFullDate(version.created_at)"
-        :content="{ side: 'left' }"
-      >
-        <!-- Active version: not a button (it's already open) — shows the draft/published switch. -->
-        <div
-          v-if="index === activeIndex"
-          class="flex items-center justify-between px-2.5 py-2 rounded-md bg-elevated"
+    <div v-if="versions.length" class="flex flex-col gap-1">
+      <span class="text-[11px] font-medium text-dimmed px-0.5">Histórico</span>
+
+      <div class="flex flex-col gap-1 max-h-72 overflow-y-auto">
+        <UTooltip
+          v-for="(version, index) in versions"
+          :key="version.id"
+          :text="formatFullDate(version.created_at)"
+          :content="{ side: 'left' }"
         >
-          <div class="flex items-center gap-2.5 min-w-0">
-            <UIcon name="i-lucide-check-circle-2" class="size-3.5 shrink-0 text-primary" />
+          <UButton
+            block
+            color="neutral"
+            variant="ghost"
+            :disabled="index === activeIndex"
+            class="justify-start px-2.5 py-2 h-auto rounded-md disabled:opacity-100 disabled:cursor-default"
+            :class="index === activeIndex ? 'bg-elevated' : ''"
+            @click="emit('selectVersion', index)"
+          >
+            <div class="flex items-center gap-2.5 min-w-0 flex-1">
+              <UIcon
+                :name="index === activeIndex ? 'i-lucide-check-circle-2' : 'i-lucide-clock-3'"
+                class="size-3.5 shrink-0"
+                :class="index === activeIndex ? 'text-primary' : 'text-dimmed'"
+              />
+              <div class="flex flex-col items-start min-w-0">
+                <div class="flex items-center gap-1.5">
+                  <span class="text-xs font-medium text-default">v{{ version.number }}</span>
 
-            <div class="flex flex-col items-start min-w-0 gap-0.5">
-              <div class="flex items-center gap-1.5">
-                <span class="text-xs font-semibold text-highlighted">v{{ version.number }}</span>
+                  <UBadge
+                    v-if="index === 0"
+                    label="Atual"
+                    size="xs"
+                    variant="subtle"
+                    color="neutral"
+                    class="text-[9px] px-1 py-0 h-3.5 leading-none"
+                  />
 
-                <UBadge
-                  v-if="index === 0"
-                  label="Atual"
-                  size="xs"
-                  variant="subtle"
-                  color="neutral"
-                  class="text-[9px] px-1 py-0 h-3.5 leading-none"
-                />
+                  <UBadge
+                    v-if="version.status === 'published'"
+                    label="Publicada"
+                    size="xs"
+                    variant="subtle"
+                    color="success"
+                    class="text-[9px] px-1 py-0 h-3.5 leading-none"
+                  />
+                </div>
+                <span class="text-[10.5px] text-dimmed leading-tight text-start">
+                  {{ timeAgoLabel(version.created_at) }}
+                </span>
               </div>
-
-              <span class="text-[11px] text-dimmed leading-none">
-                {{ timeAgoLabel(version.created_at) }}
-              </span>
             </div>
-          </div>
-
-          <CDocumentVersionStatusSelect
-            :model-value="version.status"
-            size="xs"
-            @update:model-value="emit('setStatus', $event as iDocumentVersionStatus)"
-          />
-        </div>
-
-        <UButton
-          v-else
-          block
-          color="neutral"
-          variant="ghost"
-          class="justify-between px-2.5 py-2 text-start h-auto rounded-md group"
-          @click="emit('selectVersion', index)"
-        >
-          <div class="flex items-center gap-2.5 min-w-0">
-            <UIcon
-              name="i-lucide-clock-3"
-              class="size-3.5 shrink-0 text-dimmed group-hover:text-muted transition-colors"
-            />
-
-            <div class="flex flex-col items-start min-w-0 gap-0.5">
-              <div class="flex items-center gap-1.5">
-                <span class="text-xs font-medium text-default">v{{ version.number }}</span>
-
-                <UBadge
-                  v-if="index === 0"
-                  label="Atual"
-                  size="xs"
-                  variant="subtle"
-                  color="neutral"
-                  class="text-[9px] px-1 py-0 h-3.5 leading-none"
-                />
-
-                <UBadge
-                  v-if="version.status === 'published'"
-                  label="Publicada"
-                  size="xs"
-                  variant="subtle"
-                  color="success"
-                  class="text-[9px] px-1 py-0 h-3.5 leading-none"
-                />
-              </div>
-
-              <span class="text-[11px] text-dimmed leading-none">
-                {{ timeAgoLabel(version.created_at) }}
-              </span>
-            </div>
-          </div>
-        </UButton>
-      </UTooltip>
+          </UButton>
+        </UTooltip>
+      </div>
     </div>
+
+    <template v-if="activeVersion">
+      <USeparator class="my-0.5" />
+
+      <label class="flex items-center justify-between gap-2 px-0.5 cursor-pointer select-none">
+        <div class="flex flex-col">
+          <span class="text-xs font-medium text-default">Publicar versão</span>
+          <span class="text-[10.5px] text-dimmed leading-tight">
+            Torna v{{ activeVersion.number }} somente leitura e visível como a versão oficial.
+          </span>
+        </div>
+        <USwitch
+          :model-value="isPublished"
+          color="success"
+          size="xs"
+          @update:model-value="togglePublished"
+        />
+      </label>
+    </template>
   </div>
 </template>
