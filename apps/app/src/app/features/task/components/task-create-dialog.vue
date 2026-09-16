@@ -109,6 +109,7 @@ async function onSubmit() {
           <CTaskPrioritySelect v-model="state.priority" size="xs" placeholder="Prioridade" />
           <CTaskTypeSelect v-model="state.type" size="xs" placeholder="Tipo" />
           <CTaskMemberSelect v-model="state.assignees" size="xs" />
+          <CTaskDeadlineSelect v-model="state.endDate" size="xs" />
         </div>
       </form>
     </template>

@@ -29,7 +29,7 @@ defineOptions({ name: 'MemberOwnerIndicator' })
 <template>
   <UTooltip :text="tooltipText">
     <div class="flex items-center gap-1.5 shrink-0">
-      <UAvatar :src="owner?.profile?.photo || ''" :alt="displayName" size="3xs" />
+      <CMemberAvatar :member="owner ?? null" size="3xs" />
       <span
         v-if="!compact"
         class="text-xs text-dimmed truncate max-w-24"

@@ -14,11 +14,12 @@ const memberItems = computed(() =>
   members.value.map((m) => ({
     label: m.profile?.full_name,
     value: m.id,
-    avatar: {
-      src: m.profile?.photo ?? '',
-      alt: m.profile?.full_name ?? '',
-    },
+    member: m,
   })),
+)
+
+const selectedMembers = computed(() =>
+  model.value.map((id) => members.value.find((m) => m.id === id)).filter((m) => !!m),
 )
 </script>
 
@@ -28,7 +29,6 @@ const memberItems = computed(() =>
     :items="memberItems"
     value-key="value"
     multiple
-    icon="i-lucide-user"
     :size="size ?? 'sm'"
     variant="ghost"
     color="neutral"
@@ -38,15 +38,14 @@ const memberItems = computed(() =>
       itemLabel: 'whitespace-nowrap truncate',
     }"
   >
-    <template #item="{ item }">
-      <UAvatar
-        v-if="item.avatar?.src"
-        :src="item.avatar.src"
-        :alt="item.avatar.alt"
-        size="3xs"
-        class="shrink-0"
-      />
+    <template #leading>
+      <UAvatarGroup v-if="selectedMembers.length" size="3xs" :max="3">
+        <CMemberAvatar v-for="m in selectedMembers" :key="m.id" :member="m" />
+      </UAvatarGroup>
       <UIcon v-else name="i-lucide-user" class="size-4 shrink-0 text-neutral-400" />
+    </template>
+    <template #item="{ item }">
+      <CMemberAvatar :member="item.member" size="3xs" class="shrink-0" />
       <span v-text="item.label" class="truncate whitespace-nowrap" />
     </template>
   </USelectMenu>

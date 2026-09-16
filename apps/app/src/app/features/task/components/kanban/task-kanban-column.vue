@@ -25,7 +25,7 @@ useDroppable({
 </script>
 
 <template>
-  <div ref="columnRef" class="w-[264px] shrink-0 flex flex-col overflow-hidden">
+  <div ref="columnRef" class="w-[320px] shrink-0 flex flex-col overflow-hidden">
     <header class="flex items-center justify-between gap-2 px-1 pb-3 border-b border-default">
       <div class="flex items-center gap-2">
         <span

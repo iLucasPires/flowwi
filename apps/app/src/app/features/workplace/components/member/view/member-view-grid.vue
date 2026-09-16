@@ -78,11 +78,7 @@ function getMemberItems(member: iWorkplaceMember): DropdownMenuItem[] {
         class="rounded-lg overflow-hidden bg-elevated/40 p-4 transition-colors hover:bg-elevated/70"
       >
         <div class="flex items-start gap-3">
-          <UAvatar
-            :src="m.profile?.photo ?? undefined"
-            :alt="m.profile?.full_name ?? m.profile?.email ?? 'Avatar'"
-            size="md"
-          />
+          <CMemberAvatar :member="m" size="md" />
 
           <div class="min-w-0 flex-1">
             <div class="flex items-start justify-between gap-2">

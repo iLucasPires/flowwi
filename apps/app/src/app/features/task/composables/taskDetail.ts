@@ -26,7 +26,8 @@ export const useTaskDetail = (taskId: Ref<string | null>, enabled?: Ref<boolean>
   } = useQuery({
     queryKey,
     staleTime: 60_000,
-    queryFn: () => apiFetch<iTask>(`${API_TASK_URLS.LIST}/${taskId.value}?expand=subs,assignees`),
+    queryFn: () =>
+      apiFetch<iTask>(`${API_TASK_URLS.LIST}/${taskId.value}?expand=subs,assignees,profile`),
     enabled: () => taskId.value != null && (enabled?.value ?? true),
   })
 

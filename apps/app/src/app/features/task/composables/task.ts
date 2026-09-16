@@ -28,7 +28,8 @@ export const useTask = () => {
   } = useQuery({
     queryKey: taskKeys.list(),
     staleTime: 30_000,
-    queryFn: () => apiFetch<iPaginationNumber<iTask>>(`${API_TASK_URLS.LIST}?expand=assignees`),
+    queryFn: () =>
+      apiFetch<iPaginationNumber<iTask>>(`${API_TASK_URLS.LIST}?expand=assignees,profile`),
   })
 
   /**
@@ -215,7 +216,7 @@ export const useTask = () => {
    */
   const { mutateAsync: reorderTask } = useMutation({
     mutationFn: (vars: { public_id: string; position: string; status: number }) =>
-      apiFetch<iTask>(`${API_TASK_URLS.LIST}/${vars.public_id}/reorder?expand=assignees`, {
+      apiFetch<iTask>(`${API_TASK_URLS.LIST}/${vars.public_id}/reorder?expand=assignees,profile`, {
         method: 'POST',
         body: { position: vars.position, status: vars.status },
       }),
