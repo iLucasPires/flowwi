@@ -5,7 +5,8 @@ FROM python:3.12-slim AS builder
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
   PYTHONUNBUFFERED=1 \
-  UV_CACHE_DIR=/root/.cache/uv
+  UV_CACHE_DIR=/root/.cache/uv \
+  UV_PROJECT_ENVIRONMENT=/opt/venv
 
 WORKDIR /app
 
@@ -13,8 +14,7 @@ RUN pip install --no-cache-dir uv
 
 COPY pyproject.toml uv.lock ./
 
-RUN uv venv /opt/venv && \
-  uv sync --frozen --no-dev --python /opt/venv/bin/python && \
+RUN uv sync --frozen --no-dev && \
   rm -rf "$UV_CACHE_DIR"
 
 #------------------------------------------------------------------------------
@@ -25,6 +25,7 @@ FROM python:3.12-slim AS dev
 ENV PYTHONDONTWRITEBYTECODE=1 \
   PYTHONUNBUFFERED=1 \
   UV_CACHE_DIR=/root/.cache/uv \
+  UV_PROJECT_ENVIRONMENT=/opt/venv \
   VIRTUAL_ENV=/opt/venv \
   PATH="/opt/venv/bin:$PATH"
 
@@ -34,8 +35,7 @@ RUN pip install --no-cache-dir uv
 
 COPY pyproject.toml uv.lock ./
 
-RUN uv venv /opt/venv && \
-  uv sync --frozen --python /opt/venv/bin/python && \
+RUN uv sync --frozen && \
   rm -rf "$UV_CACHE_DIR"
 
 COPY . .
