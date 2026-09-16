@@ -70,6 +70,14 @@ export function useDocumentVault() {
   // tree. The doc currently open is the one exception: its entry is kept exactly as
   // it is locally (own in-flight edits use raw PATCHes below, not this query, so a
   // wholesale replace would flash it back to whatever was last saved).
+  //
+  // `list` entries come straight from vue-query's cache, which wraps `data` in
+  // `readonly()` in dev mode to catch accidental cache mutation — but every mutator
+  // below (`updateDocTitle`, `setVersionStatus`, `onContentChange`, ...) writes
+  // straight onto these objects for optimistic UI updates. Cloning into a plain
+  // object here is what makes that legal; skipping it means those writes silently
+  // no-op (Vue logs a "target is readonly" warning) and the UI never reflects the
+  // change until something replaces the whole object.
   watch(
     documents,
     (list) => {
@@ -77,7 +85,9 @@ export function useDocumentVault() {
 
       const activeIdValue = activeId.value
       docs.value = list.map(
-        (d) => (d.id === activeIdValue ? (docs.value.find((x) => x.id === d.id) ?? d) : d),
+        (d) =>
+          (d.id === activeIdValue ? docs.value.find((x) => x.id === d.id) : undefined) ??
+          structuredClone(toRaw(d)),
       )
 
       if (activeIdValue == null) {
