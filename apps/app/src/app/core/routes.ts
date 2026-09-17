@@ -14,6 +14,7 @@ import { taskRoutes } from '@/app/features/task/routes'
 import { userRoutes } from '@/app/features/user/routes'
 import { documentRoutes } from '@/app/features/document/routes'
 import { formPublicRoutes, formRoutes } from '@/app/features/form/routes'
+import { homeRoutes } from '@/app/features/home/routes'
 import { inboxRoutes } from '@/app/features/inbox/routes'
 import { mediaPublicRoutes, mediaRoutes } from '@/app/features/media/routes'
 import { stickyRoutes } from '@/app/features/sticky/routes'
@@ -41,6 +42,7 @@ const routes: RouteRecordRaw[] = [
     path: '/dashboard',
     component: () => DashboardLayout,
     children: [
+      ...homeRoutes,
       ...documentRoutes,
       ...inboxRoutes,
       ...stickyRoutes,
