@@ -13,8 +13,13 @@ const UBadge = resolveComponent('UBadge')
 const UDropdownMenu = resolveComponent('UDropdownMenu')
 const UCheckbox = resolveComponent('UCheckbox')
 
+const editableRoles: { label: string; value: 'manager' | 'designer' }[] = [
+  { label: 'Gerente', value: 'manager' },
+  { label: 'Designer', value: 'designer' },
+]
+
 const toast = useToast()
-const { members, isLoading: loading, removeMember } = useWorkplaceMember()
+const { members, isLoading: loading, isAdmin, removeMember, updateMemberRole } = useWorkplaceMember()
 const table = useTemplateRef('table')
 
 const search = defineModel<string>('search')
@@ -24,6 +29,8 @@ const columnVisibility = ref()
 const pagination = ref({ pageIndex: 0, pageSize: 15 })
 
 function getRowItems(row: Row<iWorkplaceMember>) {
+  const canManage = isAdmin.value && row.original.role !== 'owner'
+
   return [
     { type: 'label', label: 'Ações' },
     {
@@ -39,9 +46,23 @@ function getRowItems(row: Row<iWorkplaceMember>) {
     },
     { type: 'separator' },
     { label: 'Ver detalhes', icon: 'i-lucide-list' },
-    ...(row.original.role !== 'owner'
+    ...(canManage
       ? [
           { type: 'separator' },
+          {
+            label: 'Editar papel',
+            icon: 'i-lucide-shield-half',
+            children: editableRoles.map((option) => ({
+              label: option.label,
+              type: 'checkbox' as const,
+              checked: row.original.role === option.value,
+              onSelect(e?: Event) {
+                e?.preventDefault()
+                if (row.original.role === option.value) return
+                updateMemberRole({ publicId: row.original.public_id, role: option.value })
+              },
+            })),
+          },
           {
             label: 'Remover membro',
             icon: 'i-lucide-trash',

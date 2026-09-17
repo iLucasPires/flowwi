@@ -46,11 +46,13 @@ class WorkplaceMemberAdmin(admin.ModelAdmin):
         "user",
         "workplace",
         "role",
+        "status",
         "created_at",
         "updated_at",
     )
     list_filter = (
         "role",
+        "status",
         "created_at",
         "updated_at",
     )
