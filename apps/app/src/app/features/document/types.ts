@@ -84,6 +84,8 @@ export interface iDocument {
   versions: iDocumentVersion[]
   feedbacks: iDocumentFeedback[]
   comments: iDocumentComment[]
+  deleted_at: string | null
+  deleted_by: number | null
   created_at: string
   updated_at: string
 }

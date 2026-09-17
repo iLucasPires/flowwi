@@ -16,7 +16,7 @@ defineOptions({ name: 'DocumentDeleteDialog' })
   <UModal
     v-model:open="open"
     title="Excluir documento?"
-    :description="`“${title}” será removido permanentemente. Essa ação não pode ser desfeita.`"
+    :description="`“${title}” será movido para a lixeira e pode ser restaurado depois.`"
     :ui="{ content: 'sm:max-w-sm' }"
   >
     <template #footer>
