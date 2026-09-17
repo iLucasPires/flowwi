@@ -132,6 +132,11 @@ export const API_STICKY_URLS = Object.freeze({
   RESTORE: (id: string | number) => `${API_BASE}/stickies/${id}/restore`,
 })
 
+export const API_QUICKLINK_URLS = Object.freeze({
+  LIST: `${API_BASE}/quicklinks`,
+  DETAIL: (id: string | number) => `${API_BASE}/quicklinks/${id}`,
+})
+
 export const API_WEBHOOK_URLS = Object.freeze({
   LIST: `${API_BASE}/webhooks`,
   DETAIL: (id: string | number) => `${API_BASE}/webhooks/${id}`,

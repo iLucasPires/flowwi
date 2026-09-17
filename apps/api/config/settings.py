@@ -167,6 +167,7 @@ INSTALLED_APPS = [
     "apps.domains.inbox",
     "apps.domains.sticky",
     "apps.domains.task",
+    "apps.domains.quicklink",
     "apps.domains.workplace",
     "apps.domains.user",
     "apps.integrations.google",
