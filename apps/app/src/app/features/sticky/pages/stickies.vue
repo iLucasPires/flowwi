@@ -16,15 +16,19 @@ const autofocusId = ref<number | null>(null)
 
 const showInitialLoading = computed(() => isLoading.value && stickies.value.length === 0)
 
+const search = ref('')
 const filterVisibility = ref<string | undefined>(undefined)
 
 const filteredStickies = computed(() => {
   const list = stickies.value
   if (!list.length) return []
 
+  const query = search.value.trim().toLowerCase()
+
   return list
     .filter((s) => {
       if (filterVisibility.value && s.visibility !== filterVisibility.value) return false
+      if (query && !s.text.toLowerCase().includes(query)) return false
 
       return true
     })
@@ -72,14 +76,20 @@ function onDragEnd(event: DragEndEvent) {
 <template>
   <CDashboardContent title="Stickies" description="Notas rápidas do seu workspace">
     <template #actions>
+      <UInput
+        v-model="search"
+        placeholder="Buscar..."
+        icon="i-lucide-search"
+        size="xs"
+        variant="subtle"
+      />
+
       <CStickyFilterDropdown v-model:visibility="filterVisibility" />
 
       <UButton
         label="Nova sticky"
         icon="i-lucide-plus"
-        color="primary"
-        variant="solid"
-        size="sm"
+        size="xs"
         :loading="creating"
         @click="addSticky"
       />

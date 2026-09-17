@@ -22,6 +22,10 @@ function buildCheckboxChildren(
   }))
 }
 
+function clearFilters() {
+  visibility.value = undefined
+}
+
 const items = computed<DropdownMenuItem[][]>(() => [
   [
     {
@@ -30,11 +34,24 @@ const items = computed<DropdownMenuItem[][]>(() => [
       children: buildCheckboxChildren(cStickyVisibilityItems, visibility),
     },
   ],
+  [
+    {
+      label: 'Limpar filtros',
+      icon: 'i-lucide-x',
+      onSelect: clearFilters,
+    },
+  ],
 ])
+
+const activeCount = computed(() => (visibility.value ? 1 : 0))
 </script>
 
 <template>
   <UDropdownMenu :items="items" :content="{ align: 'end', sideOffset: 8 }" size="xs">
-    <UButton icon="i-lucide-filter" color="neutral" variant="subtle" size="sm" />
+    <UButton label="Filtros" icon="i-lucide-filter" variant="subtle" color="neutral" size="xs">
+      <template v-if="activeCount > 0" #trailing>
+        <UBadge :label="activeCount" size="xs" color="primary" variant="subtle" />
+      </template>
+    </UButton>
   </UDropdownMenu>
 </template>
