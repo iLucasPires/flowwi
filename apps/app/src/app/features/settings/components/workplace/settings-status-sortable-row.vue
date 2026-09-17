@@ -98,27 +98,21 @@ function updateCategory(category: TaskStatusCategory) {
 
     <UPopover>
       <UButton size="xs" variant="ghost" color="neutral" class="p-1 shrink-0">
-        <CIconOrEmoji
-          :value="status.icon"
-          fallback="i-lucide-circle"
-          class="size-4"
-          :style="{ color: status.color }"
-        />
+        <span class="size-4 rounded-full ring-1 ring-default" :style="{ backgroundColor: status.color }" />
       </UButton>
       <template #content>
-        <div class="flex flex-col gap-2 p-2">
-          <UColorPicker :model-value="status.color" @update:model-value="updateColor" />
-          <CIconPicker
-            :model-value="status.icon"
-            :color="status.color"
-            empty-label="Ícone"
-            icon-class="size-4"
-            button-class="w-full justify-center"
-            @update:model-value="updateIcon"
-          />
-        </div>
+        <UColorPicker :model-value="status.color" class="p-2" @update:model-value="updateColor" />
       </template>
     </UPopover>
+
+    <CIconPicker
+      :model-value="status.icon"
+      :color="status.color"
+      fallback="i-lucide-circle"
+      icon-class="size-4"
+      button-class="p-1 shrink-0"
+      @update:model-value="updateIcon"
+    />
 
     <UInput
       v-if="isEditingName"
