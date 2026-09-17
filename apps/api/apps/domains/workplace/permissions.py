@@ -14,10 +14,6 @@ class IsDesignerOrReadOnly(BasePermission):
 
 
 class IsWorkplaceAdminToManageMembers(BasePermission):
-    """Editing another member's role or removing them requires owner/manager.
-
-    A manager can manage other managers and designers, but never an owner —
-    only the owner themselves can edit or remove an owner membership.
     """Editing another member's role/status or removing them requires owner/manager.
 
     A manager can manage other managers and designers, but never an owner —
