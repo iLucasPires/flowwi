@@ -3,13 +3,16 @@ import { useTrashedTasks } from '@/app/features/task/composables/taskTrash'
 import type { iTask } from '@/app/features/task/types'
 import { useTrashedStickies } from '@/app/features/sticky/composables/stickyTrash'
 import type { iSticky } from '@/app/features/sticky/types'
+import { useTrashedDocuments } from '@/app/features/document/composables/documentTrash'
+import type { iDocument } from '@/app/features/document/types'
 import type { TableColumn } from '@nuxt/ui'
 
 const UButton = resolveComponent('UButton')
 const CTaskTypeBadge = resolveComponent('CTaskTypeBadge')
+const CIconOrEmoji = resolveComponent('CIconOrEmoji')
 const CMemberOwnerIndicator = resolveComponent('CMemberOwnerIndicator')
 
-const tab = ref<'tasks' | 'stickies'>('tasks')
+const tab = ref<'tasks' | 'stickies' | 'documents'>('tasks')
 
 const { trashedTasks, isLoading: tasksLoading, restoreTask, restoring: restoringTask } = useTrashedTasks()
 const {
@@ -18,6 +21,12 @@ const {
   restoreSticky,
   restoring: restoringSticky,
 } = useTrashedStickies()
+const {
+  trashedDocuments,
+  isLoading: documentsLoading,
+  restoreDocument,
+  restoring: restoringDocument,
+} = useTrashedDocuments()
 
 const tabItems = computed(() => [
   {
@@ -27,6 +36,10 @@ const tabItems = computed(() => [
   {
     label: `Stickies${trashedStickies.value.length ? ` (${trashedStickies.value.length})` : ''}`,
     value: 'stickies',
+  },
+  {
+    label: `Documentos${trashedDocuments.value.length ? ` (${trashedDocuments.value.length})` : ''}`,
+    value: 'documents',
   },
 ])
 
@@ -119,6 +132,48 @@ const stickyColumns: TableColumn<iSticky>[] = [
       ]),
   },
 ]
+
+const documentColumns: TableColumn<iDocument>[] = [
+  {
+    accessorKey: 'title',
+    header: 'Título',
+    cell: ({ row }) =>
+      h('div', { class: 'flex items-center gap-2 min-w-0' }, [
+        h(CIconOrEmoji, {
+          value: row.original.icon,
+          fallback: 'i-lucide-file-text',
+          class: 'size-4 shrink-0',
+        }),
+        h('span', { class: 'text-sm font-medium truncate' }, row.original.title || '(sem título)'),
+      ]),
+  },
+  {
+    accessorKey: 'deleted_at',
+    header: 'Excluído em',
+    cell: ({ row }) =>
+      h('span', { class: 'text-xs text-dimmed tabular-nums' }, deletedAtLabel(row.original.deleted_at)),
+  },
+  {
+    accessorKey: 'deleted_by',
+    header: 'Excluído por',
+    cell: ({ row }) =>
+      h(CMemberOwnerIndicator, { userId: row.original.deleted_by, label: 'Excluído por' }),
+  },
+  {
+    id: 'actions',
+    cell: ({ row }) =>
+      h('div', { class: 'flex items-center justify-end' }, [
+        h(UButton, {
+          label: 'Restaurar',
+          icon: 'i-lucide-undo-2',
+          size: 'xs',
+          variant: 'subtle',
+          loading: restoringDocument.value,
+          onClick: () => restoreDocument(row.original.id),
+        }),
+      ]),
+  },
+]
 </script>
 
 <template>
@@ -126,7 +181,7 @@ const stickyColumns: TableColumn<iSticky>[] = [
     <div class="flex items-center justify-between gap-4">
       <div>
         <h2 class="text-lg font-semibold">Lixeira</h2>
-        <p class="text-sm text-dimmed mt-1">Itens excluídos de tarefas e stickies.</p>
+        <p class="text-sm text-dimmed mt-1">Itens excluídos de tarefas, stickies e documentos.</p>
       </div>
 
       <UTabs v-model="tab" :items="tabItems" size="xs" :content="false" />
@@ -157,7 +212,7 @@ const stickyColumns: TableColumn<iSticky>[] = [
       </UTable>
 
       <UTable
-        v-else
+        v-else-if="tab === 'stickies'"
         :data="trashedStickies"
         :columns="stickyColumns"
         :loading="stickiesLoading"
@@ -170,6 +225,29 @@ const stickyColumns: TableColumn<iSticky>[] = [
       >
         <template #empty>
           <UEmpty title="Nenhuma sticky excluída" icon="i-lucide-trash-2" variant="ghost" size="sm" />
+        </template>
+      </UTable>
+
+      <UTable
+        v-else
+        :data="trashedDocuments"
+        :columns="documentColumns"
+        :loading="documentsLoading"
+        class="w-full"
+        :ui="{
+          th: 'py-2.5 px-4 font-semibold text-[11px] uppercase tracking-wider text-dimmed bg-accented/30 focus:outline-none',
+          td: 'py-3 px-4 text-sm align-middle',
+          tr: 'hover:bg-accented/40 transition-colors',
+        }"
+      >
+        <template #empty>
+          <UEmpty
+            title="Nenhum documento excluído"
+            description="Documentos apagados aparecem aqui e podem ser restaurados."
+            icon="i-lucide-trash-2"
+            variant="ghost"
+            size="sm"
+          />
         </template>
       </UTable>
     </div>

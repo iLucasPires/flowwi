@@ -103,6 +103,7 @@ export const API_DOCUMENT_URLS = Object.freeze({
     `${API_BASE}/document-versions/${versionId}/new-revision`,
   GENERATE_TASK: (id: string | number) => `${API_BASE}/documents/${id}/generate-task`,
   AI_ASSIST: (id: string | number) => `${API_BASE}/documents/${id}/ai-assist`,
+  RESTORE: (id: string | number) => `${API_BASE}/documents/${id}/restore`,
 })
 
 export const API_DOCUMENT_TYPE_URLS = Object.freeze({

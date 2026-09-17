@@ -6,7 +6,7 @@ from ..permissions import DocumentAccess
 
 class DocumentSelector:
     @staticmethod
-    def viewable_for(workplace, user) -> QuerySet:
+    def viewable_for(workplace, user, *, trashed: bool = False) -> QuerySet:
         """
         Every document in `workplace` that `user` may view — unfiltered for workplace
         admins. Scopes DocumentVersion/Comment/Feedback querysets too, since their own
@@ -16,7 +16,7 @@ class DocumentSelector:
         """
         from ..models import Document
 
-        base = Document.objects.filter(workplace=workplace)
+        base = Document.objects.filter(workplace=workplace, deleted_at__isnull=not trashed)
 
         if DocumentAccess().is_workplace_admin(workplace, user):
             return base
