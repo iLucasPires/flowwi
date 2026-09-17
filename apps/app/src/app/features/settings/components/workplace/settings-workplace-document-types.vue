@@ -7,26 +7,31 @@ import { isSortable } from '@dnd-kit/vue/sortable'
 import { useDocumentType } from '@/app/features/document/composables/documentType'
 
 const overlay = useOverlay()
-const { types, deleteType, reorderType } = useDocumentType()
+const { types, createType, updateType, deleteType, reorderType } = useDocumentType()
 
-function openCreate() {
-  const component = resolveComponent('CDocumentTypeEditDialog')
-  if (typeof component === 'object') {
-    const modal = overlay.create(component)
-    modal.open()
-  }
+/** One-shot: the type that should open straight into rename mode, right after
+ * creation — same pattern as the status table. */
+const autoEditId = ref<number | null>(null)
+
+async function addType() {
+  const created = await createType({ name: 'Novo tipo', color: '#a3a3a3', icon: '', default_content: '' })
+  autoEditId.value = created.id
 }
 
-function openEdit(type: iDocumentType) {
-  const component = resolveComponent('CDocumentTypeEditDialog')
-  if (typeof component === 'object') {
-    const modal = overlay.create(component, { props: { type } })
-    modal.open()
-  }
+async function onUpdate(type: iDocumentType, data: Partial<iDocumentType>) {
+  await updateType({ id: type.id, data })
 }
 
 async function onDelete(type: iDocumentType) {
   await deleteType(type.id)
+}
+
+function openTemplate(type: iDocumentType) {
+  const component = resolveComponent('CDocumentTypeTemplateDialog')
+  if (typeof component === 'object') {
+    const modal = overlay.create(component, { props: { type } })
+    modal.open()
+  }
 }
 
 function onDragEnd(event: DragEndEvent) {
@@ -54,7 +59,7 @@ function onDragEnd(event: DragEndEvent) {
         <p class="text-sm text-dimmed mt-1">Personalize os tipos de documento do seu workspace.</p>
       </div>
 
-      <UButton label="Novo tipo" icon="i-lucide-plus" size="sm" @click="openCreate" />
+      <UButton label="Novo tipo" icon="i-lucide-plus" size="sm" @click="addType" />
     </div>
 
     <DragDropProvider @drag-end="onDragEnd">
@@ -64,8 +69,12 @@ function onDragEnd(event: DragEndEvent) {
           :key="type.id"
           :type="type"
           :index="index"
-          @edit="openEdit"
+          :auto-edit="type.id === autoEditId"
+          has-template
+          @update="onUpdate"
           @delete="onDelete"
+          @edit-template="openTemplate"
+          @auto-edit-done="autoEditId = null"
         />
       </ul>
     </DragDropProvider>

@@ -142,6 +142,7 @@ function clearIcon() {
         :value="model"
         :fallback="fallback ?? 'i-lucide-shapes'"
         :class="iconClass ?? 'size-2 text-sm'"
+        :style="{ color }"
       />
     </UButton>
 

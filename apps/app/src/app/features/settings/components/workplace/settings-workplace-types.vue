@@ -6,23 +6,19 @@ import type { DragEndEvent } from '@dnd-kit/vue'
 import { DragDropProvider } from '@dnd-kit/vue'
 import { isSortable } from '@dnd-kit/vue/sortable'
 
-const overlay = useOverlay()
-const { types, deleteType, reorderType } = useTaskType()
+const { types, createType, updateType, deleteType, reorderType } = useTaskType()
 
-function openCreate() {
-  const component = resolveComponent('CTaskTypeEditDialog')
-  if (typeof component === 'object') {
-    const modal = overlay.create(component)
-    modal.open()
-  }
+/** One-shot: the type that should open straight into rename mode, right after
+ * creation — same pattern as the status table. */
+const autoEditId = ref<number | null>(null)
+
+async function addType() {
+  const created = await createType({ name: 'Novo tipo', color: '#a3a3a3', icon: '' })
+  autoEditId.value = created.id
 }
 
-function openEdit(type: iTaskType) {
-  const component = resolveComponent('CTaskTypeEditDialog')
-  if (typeof component === 'object') {
-    const modal = overlay.create(component, { props: { type } })
-    modal.open()
-  }
+async function onUpdate(type: iTaskType, data: Partial<iTaskType>) {
+  await updateType({ id: type.id, data })
 }
 
 async function onDelete(type: iTaskType) {
@@ -54,7 +50,7 @@ function onDragEnd(event: DragEndEvent) {
         <p class="text-sm text-dimmed mt-1">Personalize os tipos de tarefa do seu workspace.</p>
       </div>
 
-      <UButton label="Novo tipo" icon="i-lucide-plus" size="sm" @click="openCreate" />
+      <UButton label="Novo tipo" icon="i-lucide-plus" size="sm" @click="addType" />
     </div>
 
     <DragDropProvider @drag-end="onDragEnd">
@@ -64,8 +60,10 @@ function onDragEnd(event: DragEndEvent) {
           :key="type.id"
           :type="type"
           :index="index"
-          @edit="openEdit"
+          :auto-edit="type.id === autoEditId"
+          @update="onUpdate"
           @delete="onDelete"
+          @auto-edit-done="autoEditId = null"
         />
       </ul>
     </DragDropProvider>
