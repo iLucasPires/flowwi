@@ -43,6 +43,7 @@ urlpatterns = [
                 path("", include("apps.domains.inbox.urls"), name="inbox"),
                 path("", include("apps.domains.task.urls"), name="task"),
                 path("", include("apps.domains.sticky.urls"), name="sticky"),
+                path("", include("apps.domains.quicklink.urls"), name="quicklink"),
                 path("", include("apps.domains.workplace.urls"), name="workplace"),
                 path("", include("apps.domains.user.urls"), name="profile"),
                 # -------------------------------------------------------------
