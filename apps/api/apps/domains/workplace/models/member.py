@@ -15,6 +15,11 @@ class WorkplaceMemberRole(models.TextChoices):
     DESIGNER = "designer", _("Designer")
 
 
+class WorkplaceMemberStatus(models.TextChoices):
+    PENDING = "pending", _("Pending")
+    ACTIVE = "active", _("Active")
+
+
 class WorkplaceMember(TimeStampedModel, UUIDModel):
     workplace = models.ForeignKey(
         to=Workplace,
@@ -38,6 +43,14 @@ class WorkplaceMember(TimeStampedModel, UUIDModel):
         default=WorkplaceMemberRole.DESIGNER,
         verbose_name=_("role"),
         help_text=_("The role of the member within the workplace."),
+    )
+
+    status = models.CharField(
+        max_length=10,
+        choices=WorkplaceMemberStatus.choices,
+        default=WorkplaceMemberStatus.ACTIVE,
+        verbose_name=_("status"),
+        help_text=_("Whether this membership is active or still awaiting admin approval."),
     )
 
     class Meta(TimeStampedModel.Meta, UUIDModel.Meta):

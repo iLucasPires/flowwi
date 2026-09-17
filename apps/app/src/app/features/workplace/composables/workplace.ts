@@ -113,13 +113,14 @@ export const useWorkplaceMutations = () => {
 
   const { mutateAsync: joinByKey, status: joinStatus } = useMutation({
     mutationFn: (inviteKey: string) =>
-      apiFetch<iWorkplace>(API_WORKPLACE_URLS.JOIN, {
+      apiFetch<{ status: 'pending' | 'active'; workplace: iWorkplace }>(API_WORKPLACE_URLS.JOIN, {
         method: 'POST',
         body: { invite_key: inviteKey },
       }),
-    onSuccess: async (_data) => {
+    onSuccess: async (data) => {
+      if (data.status !== 'active') return
       await queryClient.invalidateQueries({ queryKey: workplaceKeys.list() })
-      await setCurrent(_data)
+      await setCurrent(data.workplace)
     },
   })
 

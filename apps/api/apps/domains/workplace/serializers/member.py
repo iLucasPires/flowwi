@@ -19,10 +19,12 @@ class WorkplaceMemberSerializer(ExpandableSerializerModel, serializers.ModelSeri
             "workplace",
             "user",
             "role",
+            "status",
             "created_at",
             "updated_at",
         ]
         read_only_fields = [
+            "status",
             "created_at",
             "updated_at",
         ]

@@ -21,7 +21,7 @@ class WorkplaceViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         user = self.request.user
 
-        return self.queryset.filter(members__user=user).distinct()
+        return self.queryset.filter(members__user=user, members__status="active").distinct()
 
     @action(detail=True, methods=["post"], url_path="select")
     def select(self, request, pk=None):
@@ -55,17 +55,20 @@ class WorkplaceViewSet(viewsets.ModelViewSet):
         url_path="join",
     )
     def join(self, request):
-        workplace = WorkplaceService().join_workplace(
+        member = WorkplaceService().join_workplace(
             user=request.user,
             invite_key=request.data.get("invite_key", ""),
         )
 
         return Response(
             status=status.HTTP_200_OK,
-            data=WorkplaceSerializer(
-                workplace,
-                context={"request": request},
-            ).data,
+            data={
+                "status": member.status,
+                "workplace": WorkplaceSerializer(
+                    member.workplace,
+                    context={"request": request},
+                ).data,
+            },
         )
 
     @action(

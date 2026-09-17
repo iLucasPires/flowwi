@@ -5,7 +5,7 @@ from apps.domains.inbox.services import InboxService
 from lib.bases import ServiceBase
 
 from ..exceptions import WorkplaceNotFound
-from ..models import Workplace, WorkplaceMember, WorkplaceMemberRole
+from ..models import Workplace, WorkplaceMember, WorkplaceMemberRole, WorkplaceMemberStatus
 from ..utils import generate_invite_key
 from .member import WorkplaceMemberService
 
@@ -26,7 +26,7 @@ class WorkplaceService(ServiceBase):
 
         return workplace
 
-    def join_workplace(self, user: User, invite_key: str) -> Workplace:
+    def join_workplace(self, user: User, invite_key: str) -> WorkplaceMember:
         key = invite_key.strip()
         workplace_member = WorkplaceMemberService()
 
@@ -39,20 +39,27 @@ class WorkplaceService(ServiceBase):
         if workplace is None:
             raise WorkplaceNotFound
 
-        _member, created = workplace_member.get_or_create(
+        member, created = workplace_member.get_or_create(
             workplace=workplace,
             user=user,
-            defaults={"role": WorkplaceMemberRole.DESIGNER},
+            defaults={
+                "role": WorkplaceMemberRole.DESIGNER,
+                "status": WorkplaceMemberStatus.PENDING,
+            },
         )
 
         if created:
-            others = WorkplaceMember.objects.filter(workplace=workplace).exclude(user=user)
-            if others:
+            admins = WorkplaceMember.objects.filter(
+                workplace=workplace,
+                role__in=(WorkplaceMemberRole.OWNER, WorkplaceMemberRole.MANAGER),
+                status=WorkplaceMemberStatus.ACTIVE,
+            )
+            if admins:
                 InboxService().send_bulk(
-                    members=list(others),
-                    title="Novo membro no workspace",
-                    message=f"{user.email} entrou no workspace.",
-                    type=InboxType.MEMBER_JOINED,
+                    members=list(admins),
+                    title="Novo pedido de entrada",
+                    message=f"{user.email} pediu para entrar no workspace.",
+                    type=InboxType.MEMBER_JOIN_REQUESTED,
                 )
 
-        return workplace
+        return member

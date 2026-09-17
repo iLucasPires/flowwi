@@ -1,4 +1,5 @@
 import { API_WORKPLACE_MEMBER_URLS, apiFetch } from '@/app/core/clients/api'
+import { useUser } from '@/app/features/user/composables/user'
 import { useWorkplace } from '@/app/features/workplace/composables/workplace'
 import type { WorkplaceRole, iWorkplaceMember } from '@/app/features/workplace/types'
 import type { iPaginationNumber } from '@/app/shared/types/pagination'
@@ -15,6 +16,7 @@ export const workplaceMemberKeys = {
 
 export const useWorkplaceMember = () => {
   const toast = useToast()
+  const { user } = useUser()
   const { workplace } = useWorkplace()
   const queryClient = useQueryClient()
 
@@ -36,11 +38,11 @@ export const useWorkplaceMember = () => {
 
   const members = computed(() => data.value?.results ?? [])
 
-  const myMember = computed(() =>
-    members.value.find((m) => m.workplace?.id === workplace.value?.id),
-  )
+  const myMember = computed(() => members.value.find((m) => m.user === user.value?.id))
 
   const myRole = computed<WorkplaceRole | null>(() => myMember.value?.role ?? null)
+
+  const isAdmin = computed(() => myRole.value === 'owner' || myRole.value === 'manager')
 
   const { mutateAsync: addMember, status: addStatus } = useMutation({
     mutationFn: (vars: { user: string; role: WorkplaceRole }) =>
@@ -80,6 +82,7 @@ export const useWorkplaceMember = () => {
     members,
     myMember,
     myRole,
+    isAdmin,
     isLoading,
     refresh,
     addMember,
@@ -88,5 +91,59 @@ export const useWorkplaceMember = () => {
     updateStatus,
     removeMember,
     removeStatus,
+  }
+}
+
+/** Pending join requests — awaiting owner/manager approval. Kept separate from
+ * `useWorkplaceMember` so the default members list (used for assignees, mentions,
+ * etc.) never includes members who don't have access yet. */
+export const usePendingWorkplaceMembers = () => {
+  const toast = useToast()
+  const { workplace } = useWorkplace()
+  const queryClient = useQueryClient()
+
+  const queryKey = computed(() => [...workplaceMemberKeys.list(workplace.value?.id), 'pending'])
+
+  const {
+    data,
+    isLoading,
+    refetch: refresh,
+  } = useQuery({
+    queryKey,
+    queryFn: () =>
+      apiFetch<iPaginationNumber<iWorkplaceMember>>(API_WORKPLACE_MEMBER_URLS.LIST, {
+        query: { expand: 'profile', status: 'pending' },
+      }),
+    enabled: () => !!workplace.value?.id,
+  })
+
+  const pendingMembers = computed(() => data.value?.results ?? [])
+
+  const { mutateAsync: approveMember, status: approveStatus } = useMutation({
+    mutationFn: (publicId: string) =>
+      apiFetch<iWorkplaceMember>(`${API_WORKPLACE_MEMBER_URLS.LIST}/${publicId}/approve/`, {
+        method: 'POST',
+      }),
+    onSettled: () => queryClient.invalidateQueries({ queryKey: workplaceMemberKeys.root() }),
+    onSuccess: () => toast.add({ title: 'Membro aprovado', color: 'success' }),
+    onError: () => toast.add({ title: 'Erro ao aprovar membro', color: 'error' }),
+  })
+
+  const { mutateAsync: rejectMember, status: rejectStatus } = useMutation({
+    mutationFn: (publicId: string) =>
+      apiFetch(`${API_WORKPLACE_MEMBER_URLS.LIST}/${publicId}/`, { method: 'DELETE' }),
+    onSettled: () => queryClient.invalidateQueries({ queryKey: workplaceMemberKeys.root() }),
+    onSuccess: () => toast.add({ title: 'Pedido recusado', color: 'success' }),
+    onError: () => toast.add({ title: 'Erro ao recusar pedido', color: 'error' }),
+  })
+
+  return {
+    pendingMembers,
+    isLoading,
+    refresh,
+    approveMember,
+    approveStatus,
+    rejectMember,
+    rejectStatus,
   }
 }
