@@ -12,6 +12,7 @@ class InboxType(models.IntegerChoices):
     TASK_ASSIGNED = 4, _("Task Assigned")
     MEDIA_COMMENT = 5, _("Media Comment")
     MEMBER_JOINED = 6, _("Member Joined")
+    MEMBER_JOIN_REQUESTED = 7, _("Member Join Requested")
 
 
 class Inbox(UUIDModel, TimeStampedModel):

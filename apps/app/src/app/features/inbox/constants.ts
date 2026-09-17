@@ -5,6 +5,7 @@ export const cInboxTypeItems: Record<number, { icon: string; color: string; labe
   4: { icon: 'i-lucide-check-circle-2', color: 'text-yellow-500', label: 'Tarefa' },
   5: { icon: 'i-lucide-message-square', color: 'text-emerald-500', label: 'Comentário' },
   6: { icon: 'i-lucide-user-plus', color: 'text-blue-500', label: 'Novo membro' },
+  7: { icon: 'i-lucide-user-round-plus', color: 'text-amber-500', label: 'Pedido de entrada' },
 }
 
 export function getInboxTypeMeta(type: number) {

@@ -36,5 +36,5 @@ class WorkplaceViewSetMixin(GenericViewSet):
         return workplace
 
     def validate_workplace_permission(self, workplace):
-        if not workplace.members.filter(user=self.request.user).exists():
+        if not workplace.members.filter(user=self.request.user, status="active").exists():
             raise PermissionDenied("You are not a member of this workplace.")

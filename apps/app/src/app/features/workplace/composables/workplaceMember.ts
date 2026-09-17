@@ -93,3 +93,57 @@ export const useWorkplaceMember = () => {
     removeStatus,
   }
 }
+
+/** Pending join requests — awaiting owner/manager approval. Kept separate from
+ * `useWorkplaceMember` so the default members list (used for assignees, mentions,
+ * etc.) never includes members who don't have access yet. */
+export const usePendingWorkplaceMembers = () => {
+  const toast = useToast()
+  const { workplace } = useWorkplace()
+  const queryClient = useQueryClient()
+
+  const queryKey = computed(() => [...workplaceMemberKeys.list(workplace.value?.id), 'pending'])
+
+  const {
+    data,
+    isLoading,
+    refetch: refresh,
+  } = useQuery({
+    queryKey,
+    queryFn: () =>
+      apiFetch<iPaginationNumber<iWorkplaceMember>>(API_WORKPLACE_MEMBER_URLS.LIST, {
+        query: { expand: 'profile', status: 'pending' },
+      }),
+    enabled: () => !!workplace.value?.id,
+  })
+
+  const pendingMembers = computed(() => data.value?.results ?? [])
+
+  const { mutateAsync: approveMember, status: approveStatus } = useMutation({
+    mutationFn: (publicId: string) =>
+      apiFetch<iWorkplaceMember>(`${API_WORKPLACE_MEMBER_URLS.LIST}/${publicId}/approve/`, {
+        method: 'POST',
+      }),
+    onSettled: () => queryClient.invalidateQueries({ queryKey: workplaceMemberKeys.root() }),
+    onSuccess: () => toast.add({ title: 'Membro aprovado', color: 'success' }),
+    onError: () => toast.add({ title: 'Erro ao aprovar membro', color: 'error' }),
+  })
+
+  const { mutateAsync: rejectMember, status: rejectStatus } = useMutation({
+    mutationFn: (publicId: string) =>
+      apiFetch(`${API_WORKPLACE_MEMBER_URLS.LIST}/${publicId}/`, { method: 'DELETE' }),
+    onSettled: () => queryClient.invalidateQueries({ queryKey: workplaceMemberKeys.root() }),
+    onSuccess: () => toast.add({ title: 'Pedido recusado', color: 'success' }),
+    onError: () => toast.add({ title: 'Erro ao recusar pedido', color: 'error' }),
+  })
+
+  return {
+    pendingMembers,
+    isLoading,
+    refresh,
+    approveMember,
+    approveStatus,
+    rejectMember,
+    rejectStatus,
+  }
+}

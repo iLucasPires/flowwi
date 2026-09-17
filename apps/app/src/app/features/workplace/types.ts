@@ -2,6 +2,7 @@ import type { iCoverCredit } from '@/app/shared/types/cover'
 import type { iProfile } from '@/app/features/user/profile'
 
 export type WorkplaceRole = 'owner' | 'manager' | 'designer'
+export type WorkplaceMemberStatus = 'pending' | 'active'
 
 export interface iWorkplace {
   id: number
@@ -24,6 +25,7 @@ export interface iWorkplaceMember {
   user: number
   profile: iProfile
   role: WorkplaceRole
+  status: WorkplaceMemberStatus
   created_at: string
   updated_at: string
 }

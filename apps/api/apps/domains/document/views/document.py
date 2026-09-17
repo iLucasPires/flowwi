@@ -1,3 +1,4 @@
+from django.shortcuts import get_object_or_404
 from drf_spectacular.utils import extend_schema
 from rest_framework import status
 from rest_framework.decorators import action
@@ -15,6 +16,7 @@ from ..permissions import DocumentAccess, DocumentObjectPermission
 from ..realtime import notify_document_changed
 from ..selectors import DocumentSelector
 from ..serializers import DocumentSerializer
+from ..services import DocumentService
 
 # Changing who can see/edit a document is a sharing decision, not a content edit —
 # reserved for the author and workplace admins even when a member has edit access.
@@ -35,7 +37,9 @@ class DocumentViewSet(WorkplaceViewSetMixin, ModelViewSet):
         if workplace is None:
             return self.queryset.none()
 
-        base = self.queryset.filter(workplace=workplace).prefetch_related(
+        trashed = self.request.query_params.get("trashed", "").lower() == "true"
+
+        base = self.queryset.filter(workplace=workplace, deleted_at__isnull=not trashed).prefetch_related(
             "versions",
             "feedbacks",
             "comments",
@@ -48,13 +52,29 @@ class DocumentViewSet(WorkplaceViewSetMixin, ModelViewSet):
         if self.access.is_workplace_admin(workplace, self.request.user):
             return base
 
-        return DocumentSelector.viewable_for(workplace, self.request.user)
+        return DocumentSelector.viewable_for(workplace, self.request.user, trashed=trashed)
 
     def perform_create(self, serializer):
         serializer.save(
             workplace=self.get_workplace(),
             author=self.request.user,
         )
+
+    def perform_destroy(self, instance):
+        DocumentService().trash(instance, deleted_by=self.request.user)
+
+    @extend_schema(responses={200: DocumentSerializer})
+    @action(detail=True, methods=["post"], url_path="restore")
+    def restore(self, request, pk=None):
+        document = get_object_or_404(
+            Document,
+            pk=pk,
+            workplace=self.get_workplace(),
+            deleted_at__isnull=False,
+        )
+        self.check_object_permissions(request, document)
+        document = DocumentService().restore(document)
+        return Response(DocumentSerializer(document, context={"request": request}).data)
 
     def perform_update(self, serializer):
         instance = serializer.instance

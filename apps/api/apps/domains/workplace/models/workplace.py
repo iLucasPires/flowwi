@@ -74,18 +74,29 @@ class Workplace(
     def is_owner(self, user: User) -> bool:
         return self.members.filter(
             role="owner",
+            status="active",
             user=user,
         ).exists()
 
     def is_manager(self, user: User) -> bool:
         return self.members.filter(
             role="manager",
+            status="active",
             user=user,
         ).exists()
 
     def is_designer(self, user: User) -> bool:
         return self.members.filter(
             role="designer",
+            status="active",
+            user=user,
+        ).exists()
+
+    def is_admin(self, user: User) -> bool:
+        """Owners and managers both act as workplace admins."""
+        return self.members.filter(
+            role__in=("owner", "manager"),
+            status="active",
             user=user,
         ).exists()
 

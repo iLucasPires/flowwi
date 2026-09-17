@@ -60,10 +60,12 @@ class DocumentSerializer(serializers.ModelSerializer):
             "versions",
             "feedbacks",
             "comments",
+            "deleted_at",
+            "deleted_by",
             "created_at",
             "updated_at",
         ]
-        read_only_fields = ["created_at", "updated_at", "author"]
+        read_only_fields = ["created_at", "updated_at", "author", "deleted_at", "deleted_by"]
 
     access = DocumentAccess()
 

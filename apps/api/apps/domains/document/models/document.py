@@ -4,7 +4,7 @@ from django.utils.translation import gettext_lazy as _
 
 from apps.domains.task.models import Task
 from apps.domains.workplace.models import Workplace
-from lib.models import CoverStyleModel, TimeStampedModel, UUIDModel
+from lib.models import CoverStyleModel, TimeStampedSoftDeleteModel, UUIDModel
 from lib.utils.upload import upload_to_path
 
 from .type import DocumentType
@@ -17,7 +17,7 @@ class DocumentVisibility(models.TextChoices):
     WORKPLACE = "workplace", _("Workplace")
 
 
-class Document(TimeStampedModel, UUIDModel, CoverStyleModel):
+class Document(TimeStampedSoftDeleteModel, UUIDModel, CoverStyleModel):
     """
     A written document — supports comments, feedback, and revision history.
 
@@ -125,10 +125,23 @@ class Document(TimeStampedModel, UUIDModel, CoverStyleModel):
         help_text=_("The user who created this document."),
     )
 
+    deleted_by = models.ForeignKey(
+        to=User,
+        related_name="deleted_documents",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        verbose_name=_("deleted by"),
+        help_text=_("User who deleted the document."),
+    )
+
     class Meta:
         ordering = ["-created_at"]
         verbose_name = _("Document")
         verbose_name_plural = _("Documents")
+        indexes = [
+            models.Index(fields=["workplace", "deleted_at"]),
+        ]
 
     def __str__(self):
         return self.title or f"Document #{self.pk}"

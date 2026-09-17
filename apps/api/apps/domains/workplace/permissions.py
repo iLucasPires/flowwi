@@ -18,6 +18,10 @@ class IsWorkplaceAdminToManageMembers(BasePermission):
 
     A manager can manage other managers and designers, but never an owner —
     only the owner themselves can edit or remove an owner membership.
+    """Editing another member's role/status or removing them requires owner/manager.
+
+    A manager can manage other managers and designers, but never an owner —
+    only the owner themselves can edit, approve, or remove an owner membership.
     """
 
     def has_permission(self, request, view):
