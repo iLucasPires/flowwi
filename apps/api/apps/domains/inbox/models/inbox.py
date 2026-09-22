@@ -34,6 +34,16 @@ class Inbox(UUIDModel, TimeStampedModel):
         help_text=_("The workplace member who created this notification."),
     )
 
+    related_member = models.ForeignKey(
+        to=WorkplaceMember,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="+",
+        verbose_name=_("related member"),
+        help_text=_("The membership this notification is about (e.g. a pending join request), if any."),
+    )
+
     type = models.PositiveSmallIntegerField(
         choices=InboxType.choices,
         default=InboxType.SYSTEM,

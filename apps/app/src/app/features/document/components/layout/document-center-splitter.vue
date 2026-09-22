@@ -1,37 +1,42 @@
 <script setup lang="ts">
-import type { iDocument, iDocumentLock, iDocumentSelectionAnchor, iDocumentVersion } from '@/app/features/document/types'
-import { getDocumentTypeMeta } from '@/app/features/document/utils'
-import type { iCoverCredit } from '@/app/shared/types/cover'
-import type { BreadcrumbItem } from '@nuxt/ui'
-import { useDocumentType } from '@/app/features/document/composables/documentType'
+import type {
+  iDocument,
+  iDocumentLock,
+  iDocumentSelectionAnchor,
+  iDocumentVersion,
+} from "@/app/features/document/types";
+import { getDocumentTypeMeta } from "@/app/features/document/utils";
+import type { iCoverCredit } from "@/app/shared/types/cover";
+import type { BreadcrumbItem } from "@nuxt/ui";
+import { useDocumentType } from "@/app/features/document/composables/data/document-type";
 
-defineOptions({ name: 'DocumentCenterSplitter' })
+defineOptions({ name: "DocumentCenterSplitter" });
 
 const props = defineProps<{
-  doc: iDocument
-  currentVersion: iDocumentVersion | undefined
-  activeIndex: number
-  isReadonly: boolean
-  lockedBy: iDocumentLock | null
-  isLockedByOther: boolean
-  saving: boolean
-  splitOpen: boolean
-  canComment: boolean
-  submittingAnchored: boolean
-}>()
+  doc: iDocument;
+  currentVersion: iDocumentVersion | undefined;
+  activeIndex: number;
+  isReadonly: boolean;
+  lockedBy: iDocumentLock | null;
+  isLockedByOther: boolean;
+  saving: boolean;
+  splitOpen: boolean;
+  canComment: boolean;
+  submittingAnchored: boolean;
+}>();
 
 const emit = defineEmits<{
-  titleInput: [value: string]
-  updateIcon: [icon: string]
-  selectCoverFile: [file: File]
-  selectCoverStyle: [style: string, credit: iCoverCredit]
-  removeCover: []
-  contentChange: [value: string]
-  toggleSplit: []
-  submitComment: [payload: { quote: string; content: string }]
-}>()
+  titleInput: [value: string];
+  updateIcon: [icon: string];
+  selectCoverFile: [file: File];
+  selectCoverStyle: [style: string, credit: iCoverCredit];
+  removeCover: [];
+  contentChange: [value: string];
+  toggleSplit: [];
+  submitComment: [payload: { quote: string; content: string }];
+}>();
 
-const { types: documentTypes } = useDocumentType()
+const { types: documentTypes } = useDocumentType();
 
 // Why the doc is read-only, in priority order — most specific/actionable first. Only
 // shown when `isReadonly` is true; explains a state that used to look like a silent bug
@@ -39,36 +44,36 @@ const { types: documentTypes } = useDocumentType()
 const readonlyReason = computed(() => {
   if (props.isLockedByOther && props.lockedBy) {
     return {
-      icon: 'i-lucide-lock',
+      icon: "i-lucide-lock",
       text: `${props.lockedBy.username} está editando este documento agora.`,
-    }
+    };
   }
-  if (props.currentVersion?.status === 'published') {
+  if (props.currentVersion?.status === "published") {
     return {
-      icon: 'i-lucide-file-check-2',
-      text: 'Esta versão foi publicada — crie uma nova revisão para editar.',
-    }
+      icon: "i-lucide-file-check-2",
+      text: "Esta versão foi publicada — crie uma nova revisão para editar.",
+    };
   }
   if (!props.doc.can_edit) {
-    return { icon: 'i-lucide-eye', text: 'Você só tem acesso de visualização a este documento.' }
+    return { icon: "i-lucide-eye", text: "Você só tem acesso de visualização a este documento." };
   }
-  return null
-})
+  return null;
+});
 
 const breadcrumb = computed<BreadcrumbItem[]>(() => {
-  const doc = props.doc
-  const typeLabel = getDocumentTypeMeta(documentTypes.value, doc.type)?.name ?? 'Sem tipo'
-  return [{ label: typeLabel }, { label: doc.title || 'Sem título', icon: doc.icon || undefined }]
-})
+  const doc = props.doc;
+  const typeLabel = getDocumentTypeMeta(documentTypes.value, doc.type)?.name ?? "Sem tipo";
+  return [{ label: typeLabel }, { label: doc.title || "Sem título", icon: doc.icon || undefined }];
+});
 
 // ── Select-text-to-comment ──────────────────────────────────────────────────
 // Only the read-only preview (published versions) can ever be commented on — the
 // draft editor doesn't track selection at all, since `canComment` is false there.
 
 /** Live position/text of the current non-empty selection, while previewing. */
-const selection = ref<iDocumentSelectionAnchor | null>(null)
+const selection = ref<iDocumentSelectionAnchor | null>(null);
 /** Whether the comment composer popover is open — pauses selection tracking while composing. */
-const composing = ref(false)
+const composing = ref(false);
 
 function onPreviewSelectionChange(next: iDocumentSelectionAnchor | null) {
   // Once the composer is open, its textarea takes focus and the browser collapses the
@@ -76,33 +81,33 @@ function onPreviewSelectionChange(next: iDocumentSelectionAnchor | null) {
   // Reacting to it here would null the anchor and, through `v-if="selection"` below,
   // instantly unmount the popover we just opened. Freeze the anchor while composing;
   // it's cleared explicitly once the composer actually closes.
-  if (composing.value) return
+  if (composing.value) return;
 
-  selection.value = props.canComment ? next : null
+  selection.value = props.canComment ? next : null;
 }
 
 /** Closing the composer (cancel, submit, click outside) always drops the stale anchor. */
 function onComposingChange(value: boolean) {
-  composing.value = value
-  if (!value) selection.value = null
+  composing.value = value;
+  if (!value) selection.value = null;
 }
 
 function submitComment(payload: { quote: string; content: string }) {
-  emit('submitComment', payload)
+  emit("submitComment", payload);
 }
 
 /** Scrolling moves the text away from a `fixed` toolbar anchored to old viewport coords. */
 function onContentScroll() {
-  if (!composing.value) selection.value = null
+  if (!composing.value) selection.value = null;
 }
 
 watch(
   () => props.doc.id,
   () => {
-    selection.value = null
-    composing.value = false
+    selection.value = null;
+    composing.value = false;
   },
-)
+);
 </script>
 
 <template>

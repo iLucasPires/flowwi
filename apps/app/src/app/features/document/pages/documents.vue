@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { useDocumentAi } from "@/app/features/document/composables/documentAi";
-import { useDocumentComments } from "@/app/features/document/composables/documentComments";
-import { useDocumentEditing } from "@/app/features/document/composables/documentEditing";
-import { useDocumentVault } from "@/app/features/document/composables/documentVault";
+import { useDocumentAi } from "@/app/features/document/composables/editor/document-ai";
+import { useDocumentComments } from "@/app/features/document/composables/editor/document-comments";
+import { useDocumentEditing } from "@/app/features/document/composables/editor/document-editing";
+import { useDocumentVault } from "@/app/features/document/composables/vault/document-vault";
 
 defineOptions({ name: "DocumentVaultView" });
 

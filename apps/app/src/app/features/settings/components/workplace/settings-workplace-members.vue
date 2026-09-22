@@ -1,7 +1,4 @@
 <script setup lang="ts">
-import { useWorkplaceMember } from '@/app/features/workplace/composables/workplaceMember'
-
-const { isAdmin } = useWorkplaceMember()
 const search = ref('')
 const role = ref<string | undefined>(undefined)
 </script>
@@ -22,8 +19,6 @@ const role = ref<string | undefined>(undefined)
         size="sm"
       />
     </div>
-
-    <CMemberPendingList v-if="isAdmin" />
 
     <CMemberViewTable v-model:search="search" v-model:role="role" />
   </div>

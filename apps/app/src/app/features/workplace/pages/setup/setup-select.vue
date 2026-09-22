@@ -1,10 +1,8 @@
 <script setup lang="ts">
-import { useWorkplace, useWorkplaceMutations } from '@/app/features/workplace/composables/workplace'
+import { useWorkplace } from '@/app/features/workplace/composables/workplace'
 defineOptions({ name: 'WorkplaceSelectPage' })
 
-const router = useRouter()
-const { workplaces, setCurrent } = useWorkplace()
-const { workplacesStatus } = useWorkplaceMutations()
+const { workplaces, setCurrent, refreshWorkplaces } = useWorkplace()
 
 const workplaceItems = computed(() =>
   workplaces.value.map((item) => ({
@@ -14,16 +12,26 @@ const workplaceItems = computed(() =>
 )
 
 const selectedWorkplace = ref<number | undefined>(undefined)
+const entering = ref(false)
+const loaded = ref(false)
 
-function handleContinue() {
-  if (selectedWorkplace.value) {
-    const workplaceItem = workplaces.value.find((item) => item.id === selectedWorkplace.value)
+onMounted(async () => {
+  await refreshWorkplaces()
+  loaded.value = true
+})
 
-    if (workplaceItem) {
-      setCurrent(workplaceItem)
-      router.push('/dashboard')
-    }
-  }
+async function handleContinue() {
+  if (!selectedWorkplace.value) return
+
+  const workplaceItem = workplaces.value.find((item) => item.id === selectedWorkplace.value)
+  if (!workplaceItem) return
+
+  entering.value = true
+  await setCurrent(workplaceItem)
+  // Full reload, not a router push — guarantees every composable/query starts
+  // fresh against the newly-selected workplace instead of possibly racing the
+  // "select" request that sets the workplace cookie.
+  window.location.href = '/dashboard'
 }
 </script>
 
@@ -35,7 +43,7 @@ function handleContinue() {
   >
     <template #default>
       <UEmpty
-        v-if="workplacesStatus === 'success' && !workplaces.length"
+        v-if="loaded && !workplaces.length"
         title="Nenhum workspace ainda"
         description="Crie seu primeiro workspace para começar."
         icon="i-lucide-layout-grid"
@@ -57,6 +65,7 @@ function handleContinue() {
         label="Continuar"
         block
         :disabled="!selectedWorkplace"
+        :loading="entering"
         @click="handleContinue"
       />
       <div class="flex flex-col w-full">

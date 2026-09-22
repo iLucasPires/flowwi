@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useWorkplaceMutations } from '@/app/features/workplace/composables/workplace'
+import { useWorkplaceMember } from '@/app/features/workplace/composables/workplaceMember'
 import type { iWorkplace } from '@/app/features/workplace/types'
 import type { iCoverUpdate } from '@/app/shared/types/cover'
 const props = defineProps<{
@@ -8,10 +9,13 @@ const props = defineProps<{
 
 const toast = useToast()
 const { updateWorkplace, regenerateInviteKey } = useWorkplaceMutations()
+const { myRole } = useWorkplaceMember()
+const isOwner = computed(() => myRole.value === 'owner')
 
 const name = ref('')
 const copyingKey = ref(false)
 const regenerating = ref(false)
+const showDeleteDialog = ref(false)
 
 watch(
   () => props.workplace.name,
@@ -120,13 +124,23 @@ async function regenerateKey() {
     </div>
 
     <UAlert
+      v-if="isOwner"
       title="Zona de Perigo"
       description="A exclusão de um workspace é permanente e não pode ser desfeita."
       variant="subtle"
       color="error"
       size="xs"
       icon="i-lucide-triangle-alert"
-      :actions="[{ label: 'Excluir Workspace', color: 'error', variant: 'solid' }]"
+      :actions="[
+        {
+          label: 'Excluir Workspace',
+          color: 'error',
+          variant: 'solid',
+          onClick: () => (showDeleteDialog = true),
+        },
+      ]"
     />
+
+    <CWorkplaceDeleteDialog v-model:open="showDeleteDialog" :workplace="workplace" />
   </div>
 </template>

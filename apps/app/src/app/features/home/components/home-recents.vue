@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useDocument } from '@/app/features/document/composables/document'
+import { useDocument } from '@/app/features/document/composables/data/document'
 import { useTask } from '@/app/features/task/composables/task'
 import { useTaskType } from '@/app/features/task/composables/taskType'
 import { getTaskTypeMeta } from '@/app/features/task/utils'

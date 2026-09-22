@@ -12,8 +12,7 @@ class FormSelector:
     @staticmethod
     def get_public(public_id: str) -> Form | None:
         return (
-            Form.objects.select_related("theme")
-            .prefetch_related(
+            Form.objects.prefetch_related(
                 "pages",
                 "pages__blocks",
                 "blocks",
@@ -22,6 +21,20 @@ class FormSelector:
                 public_id=public_id,
                 is_published=True,
             )
+            .first()
+        )
+
+    @staticmethod
+    def get_by_public_id(public_id: str) -> Form | None:
+        """Like `get_public`, but without the `is_published` gate — for the editor's preview."""
+        return (
+            Form.objects.select_related("workplace")
+            .prefetch_related(
+                "pages",
+                "pages__blocks",
+                "blocks",
+            )
+            .filter(public_id=public_id)
             .first()
         )
 

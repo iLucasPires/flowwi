@@ -3,7 +3,6 @@ from .form import FormSerializer
 from .page import FormPageSerializer
 from .public import FormPublicSerializer
 from .response import FormResponseSerializer
-from .theme import FormThemeSerializer
 
 __all__ = [
     "FormBlockSerializer",
@@ -11,5 +10,4 @@ __all__ = [
     "FormPublicSerializer",
     "FormResponseSerializer",
     "FormSerializer",
-    "FormThemeSerializer",
 ]

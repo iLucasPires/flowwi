@@ -1,25 +1,25 @@
 <script setup lang="ts">
-import type { iDocumentType } from '@/app/features/document/types'
-import { useDocumentType } from '@/app/features/document/composables/documentType'
+import type { iDocumentType } from "@/app/features/document/types";
+import { useDocumentType } from "@/app/features/document/composables/data/document-type";
 
-const open = defineModel<boolean>('open', { required: true })
+const open = defineModel<boolean>("open", { required: true });
 
 const props = defineProps<{
-  type: iDocumentType
-}>()
+  type: iDocumentType;
+}>();
 
-const { updateType } = useDocumentType()
+const { updateType } = useDocumentType();
 
-const defaultContent = ref(props.type.default_content)
-const saving = ref(false)
+const defaultContent = ref(props.type.default_content);
+const saving = ref(false);
 
 async function save() {
-  saving.value = true
+  saving.value = true;
   try {
-    await updateType({ id: props.type.id, data: { default_content: defaultContent.value } })
-    open.value = false
+    await updateType({ id: props.type.id, data: { default_content: defaultContent.value } });
+    open.value = false;
   } finally {
-    saving.value = false
+    saving.value = false;
   }
 }
 </script>

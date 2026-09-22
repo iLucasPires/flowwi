@@ -7,7 +7,6 @@ const props = defineProps<{ workplace: iWorkplace }>()
 const emit = defineEmits<{ enter: [] }>()
 
 const overlay = useOverlay()
-const router = useRouter()
 const { setCurrent } = useWorkplace()
 
 function openGeneralSettings() {
@@ -24,7 +23,9 @@ function openGeneralSettings() {
 
 async function openWorkplaceSection(section: 'members' | 'webhooks') {
   await setCurrent(props.workplace)
-  router.push(`/dashboard/workplaces/${section}`)
+  // Full reload, not a router push — guarantees every composable/query starts
+  // fresh against the newly-selected workplace.
+  window.location.href = `/dashboard/workplaces/${section}`
 }
 
 function workplaceAvatar(name: string) {

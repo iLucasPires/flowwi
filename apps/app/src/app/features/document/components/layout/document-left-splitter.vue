@@ -1,105 +1,105 @@
 <script setup lang="ts">
-import type { iDocumentType } from '@/app/features/document/types'
-import type { DropdownMenuItem } from '@nuxt/ui'
-import type { iDocSortOrder, iDocTreeItem } from '@/app/features/document/composables/documentVault'
+import type { iDocumentType } from "@/app/features/document/types";
+import type { DropdownMenuItem } from "@nuxt/ui";
+import type { iDocSortOrder, iDocTreeItem } from "@/app/features/document/types/document-vault";
 
 const props = defineProps<{
-  treeItems: iDocTreeItem[]
-  activeId: number | null
-  documentTypes: iDocumentType[]
-}>()
+  treeItems: iDocTreeItem[];
+  activeId: number | null;
+  documentTypes: iDocumentType[];
+}>();
 
 const emit = defineEmits<{
-  openPalette: []
-  openGraph: []
-  createFromTemplate: [typeId: number | null]
-  deleteDoc: [id: number]
-  renameDoc: [id: number, title: string]
-  duplicateDoc: [id: number]
-  updateType: [id: number, type: number | null]
-}>()
+  openPalette: [];
+  openGraph: [];
+  createFromTemplate: [typeId: number | null];
+  deleteDoc: [id: number];
+  renameDoc: [id: number, title: string];
+  duplicateDoc: [id: number];
+  updateType: [id: number, type: number | null];
+}>();
 
-const toast = useToast()
-const route = useRoute()
+const toast = useToast();
+const route = useRoute();
 
-const sortOrder = defineModel<iDocSortOrder>('sortOrder', { required: true })
-const typeFilter = defineModel<(number | null)[]>('typeFilter', { default: () => [] })
+const sortOrder = defineModel<iDocSortOrder>("sortOrder", { required: true });
+const typeFilter = defineModel<(number | null)[]>("typeFilter", { default: () => [] });
 
 // -----------------------------------------------------------------------------
 // Context menu (right-click)
 // -----------------------------------------------------------------------------
 
-const contextMenuItem = ref<iDocTreeItem | null>(null)
+const contextMenuItem = ref<iDocTreeItem | null>(null);
 
 function findItemByDocId(items: iDocTreeItem[], docId: number): iDocTreeItem | null {
   for (const item of items) {
-    if (item.docId === docId) return item
+    if (item.docId === docId) return item;
     if (item.children) {
-      const found = findItemByDocId(item.children, docId)
-      if (found) return found
+      const found = findItemByDocId(item.children, docId);
+      if (found) return found;
     }
   }
-  return null
+  return null;
 }
 
 function onTreeContextMenu(event: MouseEvent) {
   // Sobe até o <li> do item de árvore, depois encontra o marcador data-doc-id dentro dele
-  const listItemEl = (event.target as HTMLElement).closest('li[role="presentation"]')
-  if (!listItemEl) return
-  const markerEl = listItemEl.querySelector('[data-doc-id]')
+  const listItemEl = (event.target as HTMLElement).closest('li[role="presentation"]');
+  if (!listItemEl) return;
+  const markerEl = listItemEl.querySelector("[data-doc-id]");
   if (!markerEl) {
     // Clicou em grupo sem docId — bloqueia abertura do menu
-    event.preventDefault()
-    event.stopPropagation()
-    return
+    event.preventDefault();
+    event.stopPropagation();
+    return;
   }
-  const docId = Number(markerEl.getAttribute('data-doc-id'))
-  const item = findItemByDocId(props.treeItems, docId)
-  if (!item) return
-  contextMenuItem.value = item
+  const docId = Number(markerEl.getAttribute("data-doc-id"));
+  const item = findItemByDocId(props.treeItems, docId);
+  if (!item) return;
+  contextMenuItem.value = item;
 }
 
 const contextMenuItems = computed(() =>
   contextMenuItem.value ? pageMenuItems(contextMenuItem.value) : [],
-)
+);
 
 // -----------------------------------------------------------------------------
 // Tree
 // -----------------------------------------------------------------------------
 
-const collapsedGroups = ref(new Set<string>())
+const collapsedGroups = ref(new Set<string>());
 
 function getGroupKeys(items: iDocTreeItem[]): string[] {
   return items.flatMap((item) =>
     item.children ? [item.value, ...getGroupKeys(item.children)] : [],
-  )
+  );
 }
 
 const expandedKeys = computed(() =>
   getGroupKeys(props.treeItems).filter((key) => !collapsedGroups.value.has(key)),
-)
+);
 
 function updateExpanded(keys: string[]) {
-  const groups = getGroupKeys(props.treeItems)
+  const groups = getGroupKeys(props.treeItems);
 
-  collapsedGroups.value = new Set(groups.filter((group) => !keys.includes(group)))
+  collapsedGroups.value = new Set(groups.filter((group) => !keys.includes(group)));
 }
 
 // -----------------------------------------------------------------------------
 // Delete (with confirmation)
 // -----------------------------------------------------------------------------
 
-const overlay = useOverlay()
+const overlay = useOverlay();
 
 async function requestDelete(item: iDocTreeItem) {
-  if (item.docId == null) return
+  if (item.docId == null) return;
 
-  const component = resolveComponent('CDocumentDeleteDialog')
-  if (typeof component !== 'object') return
+  const component = resolveComponent("CDocumentDeleteDialog");
+  if (typeof component !== "object") return;
 
-  const modal = overlay.create(component, { props: { title: item.label } })
-  const confirmed = await modal.open()
-  if (confirmed) emit('deleteDoc', item.docId)
+  const modal = overlay.create(component, { props: { title: item.label } });
+  const confirmed = await modal.open();
+  if (confirmed) emit("deleteDoc", item.docId);
 }
 
 // -----------------------------------------------------------------------------
@@ -107,14 +107,14 @@ async function requestDelete(item: iDocTreeItem) {
 // -----------------------------------------------------------------------------
 
 async function requestRename(item: iDocTreeItem) {
-  if (item.docId == null) return
+  if (item.docId == null) return;
 
-  const component = resolveComponent('CDocumentRenameDialog')
-  if (typeof component !== 'object') return
+  const component = resolveComponent("CDocumentRenameDialog");
+  if (typeof component !== "object") return;
 
-  const modal = overlay.create(component, { props: { title: item.label } })
-  const title = await modal.open()
-  if (title != null) emit('renameDoc', item.docId, title)
+  const modal = overlay.create(component, { props: { title: item.label } });
+  const title = await modal.open();
+  if (title != null) emit("renameDoc", item.docId, title);
 }
 
 // -----------------------------------------------------------------------------
@@ -122,16 +122,16 @@ async function requestRename(item: iDocTreeItem) {
 // -----------------------------------------------------------------------------
 
 function docUrl(item: iDocTreeItem) {
-  return `${location.origin}${route.path}?doc=${item.docId}`
+  return `${location.origin}${route.path}?doc=${item.docId}`;
 }
 
 async function copyLink(item: iDocTreeItem) {
-  await navigator.clipboard.writeText(docUrl(item))
-  toast.add({ title: 'Link copiado', icon: 'i-lucide-check' })
+  await navigator.clipboard.writeText(docUrl(item));
+  toast.add({ title: "Link copiado", icon: "i-lucide-check" });
 }
 
 function openInNewTab(item: iDocTreeItem) {
-  window.open(docUrl(item), '_blank')
+  window.open(docUrl(item), "_blank");
 }
 
 // -----------------------------------------------------------------------------
@@ -139,55 +139,55 @@ function openInNewTab(item: iDocTreeItem) {
 // -----------------------------------------------------------------------------
 
 function pageMenuItems(item: iDocTreeItem): DropdownMenuItem[][] {
-  if (item.docId == null) return []
-  const docId = item.docId
+  if (item.docId == null) return [];
+  const docId = item.docId;
 
   const typeItems: DropdownMenuItem[] = [
     {
-      label: 'Sem tipo',
-      icon: 'i-lucide-file-question',
+      label: "Sem tipo",
+      icon: "i-lucide-file-question",
       checked: item.type == null,
-      type: 'checkbox' as const,
-      onSelect: () => emit('updateType', docId, null),
+      type: "checkbox" as const,
+      onSelect: () => emit("updateType", docId, null),
     },
     ...props.documentTypes.map((t) => ({
       label: t.name,
-      icon: t.icon || 'i-lucide-tag',
+      icon: t.icon || "i-lucide-tag",
       color: t.color,
       checked: item.type === t.id,
-      type: 'checkbox' as const,
-      onSelect: () => emit('updateType', docId, t.id),
+      type: "checkbox" as const,
+      onSelect: () => emit("updateType", docId, t.id),
     })),
-  ]
+  ];
 
   return [
     [
-      { label: 'Copiar link', icon: 'i-lucide-link', onSelect: () => copyLink(item) },
-      { label: 'Duplicar', icon: 'i-lucide-copy', onSelect: () => emit('duplicateDoc', docId) },
-      { label: 'Renomear', icon: 'i-lucide-pencil', onSelect: () => requestRename(item) },
-      { label: 'Mudar tipo', icon: 'i-lucide-tag', children: typeItems },
+      { label: "Copiar link", icon: "i-lucide-link", onSelect: () => copyLink(item) },
+      { label: "Duplicar", icon: "i-lucide-copy", onSelect: () => emit("duplicateDoc", docId) },
+      { label: "Renomear", icon: "i-lucide-pencil", onSelect: () => requestRename(item) },
+      { label: "Mudar tipo", icon: "i-lucide-tag", children: typeItems },
     ],
     [
       {
-        label: 'Mover para lixeira',
-        icon: 'i-lucide-trash-2',
-        color: 'error',
+        label: "Mover para lixeira",
+        icon: "i-lucide-trash-2",
+        color: "error",
         onSelect: () => requestDelete(item),
       },
     ],
     [
       {
-        label: 'Abrir em nova aba',
-        icon: 'i-lucide-external-link',
+        label: "Abrir em nova aba",
+        icon: "i-lucide-external-link",
         onSelect: () => openInNewTab(item),
       },
     ],
-  ]
+  ];
 }
 
 defineOptions({
-  name: 'DocumentTree',
-})
+  name: "DocumentTree",
+});
 </script>
 
 <template>

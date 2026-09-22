@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { getInboxTypeMeta } from '@/app/features/inbox/constants'
+import { getInboxBodyComponent, getInboxTypeMeta } from '@/app/features/inbox/constants'
 import type { iInbox } from '@/app/features/inbox/types'
 import { formatTimeAgo } from '@vueuse/core'
 
@@ -12,6 +12,7 @@ const emit = defineEmits<{
 }>()
 
 const typeMeta = computed(() => getInboxTypeMeta(props.item.type))
+const bodyComponent = computed(() => resolveComponent(getInboxBodyComponent(props.item.type)))
 
 const senderName = computed(() => {
   const sender = props.item.sender
@@ -47,7 +48,7 @@ const senderName = computed(() => {
     </header>
 
     <div class="flex-1 min-h-0 overflow-y-auto px-6 py-4">
-      <CTextBlock weight="normal" size="sm" :text="item.message" />
+      <component :is="bodyComponent" :item="item" />
     </div>
   </div>
 </template>

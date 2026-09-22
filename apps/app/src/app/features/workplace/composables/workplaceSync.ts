@@ -1,5 +1,5 @@
 import { API_SYNC_URLS } from '@/app/core/clients/api'
-import { documentKeys } from '@/app/features/document/composables/document'
+import { documentKeys } from '@/app/features/document/composables/data/document'
 import { stickyKeys } from '@/app/features/sticky/composables/sticky'
 import { taskKeys } from '@/app/features/task/composables/task'
 import { useWorkplace } from '@/app/features/workplace/composables/workplace'

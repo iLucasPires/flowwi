@@ -1,37 +1,37 @@
 <script setup lang="ts">
-import { DOCUMENT_AI_ACTIONS } from '@/app/features/document/composables/documentAi'
+import { DOCUMENT_AI_ACTIONS } from "@/app/features/document/composables/editor/document-ai";
 
 defineProps<{
-  aiOutput: string
-  aiLabel: string
-  aiRunning: boolean
-  aiRunningKey: string | null
-  aiPrompt: string
-}>()
+  aiOutput: string;
+  aiLabel: string;
+  aiRunning: boolean;
+  aiRunningKey: string | null;
+  aiPrompt: string;
+}>();
 
 const emit = defineEmits<{
-  runAi: [actionKey?: string]
-  insertAi: []
-  clearAi: []
-  'update:aiPrompt': [value: string]
-}>()
+  runAi: [actionKey?: string];
+  insertAi: [];
+  clearAi: [];
+  "update:aiPrompt": [value: string];
+}>();
 
 function getActionIcon(key: string) {
   switch (key) {
-    case 'resumir':
-      return 'i-lucide-file-text'
-    case 'continuar':
-      return 'i-lucide-pen-line'
-    case 'titulos':
-      return 'i-lucide-heading'
-    case 'encurtar':
-      return 'i-lucide-scissors'
+    case "resumir":
+      return "i-lucide-file-text";
+    case "continuar":
+      return "i-lucide-pen-line";
+    case "titulos":
+      return "i-lucide-heading";
+    case "encurtar":
+      return "i-lucide-scissors";
     default:
-      return 'i-lucide-sparkles'
+      return "i-lucide-sparkles";
   }
 }
 
-defineOptions({ name: 'DocumentPanelAi' })
+defineOptions({ name: "DocumentPanelAi" });
 </script>
 
 <template>
@@ -78,7 +78,7 @@ defineOptions({ name: 'DocumentPanelAi' })
         <div class="flex items-center gap-1.5">
           <UIcon name="i-lucide-sparkles" class="size-3 text-primary animate-pulse" />
           <span class="text-[11px] font-semibold text-primary uppercase tracking-wider">
-            {{ aiLabel || 'Resultado' }}
+            {{ aiLabel || "Resultado" }}
           </span>
         </div>
 

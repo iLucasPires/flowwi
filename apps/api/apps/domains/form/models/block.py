@@ -19,6 +19,15 @@ class FormBlockType(models.TextChoices):
     CHOICE = "choice", _("Choice")
     SELECT = "select", _("Select")
     CONTENT = "content", _("Content")
+    PHONE = "phone", _("Phone")
+    URL = "url", _("URL")
+    YES_NO = "yes_no", _("Yes/No")
+    RATING = "rating", _("Rating")
+    SCALE = "scale", _("Scale")
+    SLIDER = "slider", _("Slider")
+    RANKING = "ranking", _("Ranking")
+    COUNTRY = "country", _("Country")
+    SIGNATURE = "signature", _("Signature")
 
 
 class FormBlock(UUIDModel, TimeStampedModel):
@@ -62,6 +71,46 @@ class FormBlock(UUIDModel, TimeStampedModel):
         default=dict,
         blank=True,
         verbose_name=_("condition"),
+        help_text=_(
+            "Visibility condition. Either a single condition "
+            "`{field_id, operator, value}` or a group "
+            "`{op:'and'|'or', rules:[...]}` for advanced logic."
+        ),
+    )
+
+    default_value = models.JSONField(
+        default=None,
+        null=True,
+        blank=True,
+        verbose_name=_("default value"),
+        help_text=_("Default value pre-filled for the respondent."),
+    )
+
+    prefix = models.CharField(
+        max_length=32,
+        blank=True,
+        default="",
+        verbose_name=_("prefix"),
+        help_text=_("Prefix label shown before the input (e.g. 'R$', 'US$')."),
+    )
+
+    suffix = models.CharField(
+        max_length=32,
+        blank=True,
+        default="",
+        verbose_name=_("suffix"),
+        help_text=_("Suffix label shown after the input (e.g. 'kg', '%', 'years')."),
+    )
+
+    logic_jump = models.JSONField(
+        default=dict,
+        blank=True,
+        verbose_name=_("logic jump"),
+        help_text=_(
+            "Jump rules mapping answer values → target page order (or 'end'). "
+            "Example: `{\"yes\": 2, \"no\": \"end\"}` — when this block is answered, "
+            "jump to page 2 or finish the form."
+        ),
     )
 
     client_id = models.CharField(

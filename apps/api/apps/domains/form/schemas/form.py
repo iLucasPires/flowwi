@@ -18,6 +18,15 @@ class BlockType(StrEnum):
     CHOICE = "choice"
     SELECT = "select"
     CONTENT = "content"
+    PHONE = "phone"
+    URL = "url"
+    YES_NO = "yes_no"
+    RATING = "rating"
+    SCALE = "scale"
+    SLIDER = "slider"
+    RANKING = "ranking"
+    COUNTRY = "country"
+    SIGNATURE = "signature"
 
 
 class ConditionOperator(StrEnum):
@@ -32,7 +41,7 @@ class ConditionOperator(StrEnum):
 
 
 # =============================================================================
-# Condition
+# Condition (single + nested groups)
 # =============================================================================
 
 
@@ -44,6 +53,21 @@ class ConditionSchema(BaseModel):
     value: str | int | float | bool | None = None
 
     model_config = {"extra": "forbid"}
+
+
+class ConditionGroupSchema(BaseModel):
+    """Group of rules combined with AND/OR. Can be nested arbitrarily."""
+
+    op: Literal["and", "or"]
+    rules: list["ConditionSchema | ConditionGroupSchema"]
+
+    model_config = {"extra": "forbid"}
+
+
+ConditionGroupSchema.model_rebuild()
+
+# Accepted condition payloads: legacy single rule, or a group
+ConditionPayload = ConditionSchema | ConditionGroupSchema
 
 
 # =============================================================================
@@ -75,7 +99,7 @@ class BaseFieldConfig(BaseModel):
 
 
 class TextFieldConfig(BaseFieldConfig):
-    type: Literal["text", "email"] = "text"
+    type: Literal["text", "email", "phone", "url"] = "text"
     min_length: int | None = None
     max_length: int | None = None
     pattern: str | None = None
@@ -83,7 +107,7 @@ class TextFieldConfig(BaseFieldConfig):
 
 
 class NumberFieldConfig(BaseFieldConfig):
-    type: Literal["number"] = "number"
+    type: Literal["number", "slider"] = "number"
     min: float | None = None
     max: float | None = None
     step: float | None = None
@@ -107,7 +131,7 @@ class SelectOption(BaseModel):
 
 
 class SelectFieldConfig(BaseFieldConfig):
-    type: Literal["select", "choice"] = "select"
+    type: Literal["select", "choice", "ranking"] = "select"
     options: list[SelectOption] = Field(default_factory=list)
     multiple: bool | None = None
 
@@ -139,6 +163,38 @@ class ContentFieldConfig(BaseModel):
     model_config = {"extra": "forbid"}
 
 
+class YesNoFieldConfig(BaseFieldConfig):
+    type: Literal["yes_no"] = "yes_no"
+    yes_label: str = "Yes"
+    no_label: str = "No"
+
+
+class RatingFieldConfig(BaseFieldConfig):
+    type: Literal["rating"] = "rating"
+    max_stars: int = 5
+    icon: str = "star"  # star | heart | thumb
+    allow_half: bool = False
+
+
+class ScaleFieldConfig(BaseFieldConfig):
+    type: Literal["scale"] = "scale"
+    min_label: str = ""
+    max_label: str = ""
+    min_value: int = 0
+    max_value: int = 10
+    show_labels: bool = True
+
+
+class CountryFieldConfig(BaseFieldConfig):
+    type: Literal["country"] = "country"
+    preferred: list[str] | None = None  # ISO country codes pinned to top
+
+
+class SignatureFieldConfig(BaseFieldConfig):
+    type: Literal["signature"] = "signature"
+    typed_allowed: bool = True  # allow typed as fallback to drawn
+
+
 FieldConfig = Annotated[
     TextFieldConfig
     | NumberFieldConfig
@@ -146,7 +202,12 @@ FieldConfig = Annotated[
     | TimeFieldConfig
     | SelectFieldConfig
     | FileFieldConfig
-    | ContentFieldConfig,
+    | ContentFieldConfig
+    | YesNoFieldConfig
+    | RatingFieldConfig
+    | ScaleFieldConfig
+    | CountryFieldConfig
+    | SignatureFieldConfig,
     Field(discriminator="type"),
 ]
 
@@ -158,11 +219,20 @@ FieldConfig = Annotated[
 BLOCK_CONFIG_SCHEMAS: dict[str, type[BaseModel]] = {
     BlockType.TEXT: TextFieldConfig,
     BlockType.EMAIL: TextFieldConfig,
+    BlockType.PHONE: TextFieldConfig,
+    BlockType.URL: TextFieldConfig,
     BlockType.NUMBER: NumberFieldConfig,
+    BlockType.SLIDER: NumberFieldConfig,
     BlockType.TIME: TimeFieldConfig,
     BlockType.DATE: DateFieldConfig,
     BlockType.SELECT: SelectFieldConfig,
     BlockType.CHOICE: SelectFieldConfig,
+    BlockType.RANKING: SelectFieldConfig,
     BlockType.FILE: FileFieldConfig,
     BlockType.CONTENT: ContentFieldConfig,
+    BlockType.YES_NO: YesNoFieldConfig,
+    BlockType.RATING: RatingFieldConfig,
+    BlockType.SCALE: ScaleFieldConfig,
+    BlockType.COUNTRY: CountryFieldConfig,
+    BlockType.SIGNATURE: SignatureFieldConfig,
 }

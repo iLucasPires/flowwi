@@ -2,6 +2,7 @@ from django.conf import settings
 from drf_spectacular.utils import extend_schema
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
+from rest_framework.exceptions import PermissionDenied
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
@@ -22,6 +23,12 @@ class WorkplaceViewSet(viewsets.ModelViewSet):
         user = self.request.user
 
         return self.queryset.filter(members__user=user, members__status="active").distinct()
+
+    def perform_destroy(self, instance):
+        if not instance.is_owner(self.request.user):
+            raise PermissionDenied("Apenas o owner pode excluir o workspace.")
+
+        WorkplaceService().trash(instance)
 
     @action(detail=True, methods=["post"], url_path="select")
     def select(self, request, pk=None):

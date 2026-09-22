@@ -1,53 +1,58 @@
 <script setup lang="ts">
-import type { iDocumentType } from '@/app/features/document/types'
-import { calcReorderPosition } from '@/app/shared/utils/ordering'
-import type { DragEndEvent } from '@dnd-kit/vue'
-import { DragDropProvider } from '@dnd-kit/vue'
-import { isSortable } from '@dnd-kit/vue/sortable'
-import { useDocumentType } from '@/app/features/document/composables/documentType'
+import type { iDocumentType } from "@/app/features/document/types";
+import { calcReorderPosition } from "@/app/shared/utils/ordering";
+import type { DragEndEvent } from "@dnd-kit/vue";
+import { DragDropProvider } from "@dnd-kit/vue";
+import { isSortable } from "@dnd-kit/vue/sortable";
+import { useDocumentType } from "@/app/features/document/composables/data/document-type";
 
-const overlay = useOverlay()
-const { types, createType, updateType, deleteType, reorderType } = useDocumentType()
+const overlay = useOverlay();
+const { types, createType, updateType, deleteType, reorderType } = useDocumentType();
 
 /** One-shot: the type that should open straight into rename mode, right after
  * creation — same pattern as the status table. */
-const autoEditId = ref<number | null>(null)
+const autoEditId = ref<number | null>(null);
 
 async function addType() {
-  const created = await createType({ name: 'Novo tipo', color: '#a3a3a3', icon: '', default_content: '' })
-  autoEditId.value = created.id
+  const created = await createType({
+    name: "Novo tipo",
+    color: "#a3a3a3",
+    icon: "",
+    default_content: "",
+  });
+  autoEditId.value = created.id;
 }
 
 async function onUpdate(type: iDocumentType, data: Partial<iDocumentType>) {
-  await updateType({ id: type.id, data })
+  await updateType({ id: type.id, data });
 }
 
 async function onDelete(type: iDocumentType) {
-  await deleteType(type.id)
+  await deleteType(type.id);
 }
 
 function openTemplate(type: iDocumentType) {
-  const component = resolveComponent('CDocumentTypeTemplateDialog')
-  if (typeof component === 'object') {
-    const modal = overlay.create(component, { props: { type } })
-    modal.open()
+  const component = resolveComponent("CDocumentTypeTemplateDialog");
+  if (typeof component === "object") {
+    const modal = overlay.create(component, { props: { type } });
+    modal.open();
   }
 }
 
 function onDragEnd(event: DragEndEvent) {
-  if (event.canceled) return
-  const { source } = event.operation
-  if (!source || !isSortable(source)) return
+  if (event.canceled) return;
+  const { source } = event.operation;
+  if (!source || !isSortable(source)) return;
 
-  const initialIndex = Number(source.sortable.initialIndex)
-  const finalIndex = Number(source.sortable.index)
-  if (initialIndex === finalIndex) return
+  const initialIndex = Number(source.sortable.initialIndex);
+  const finalIndex = Number(source.sortable.index);
+  if (initialIndex === finalIndex) return;
 
-  const item = types.value[initialIndex]
-  if (!item) return
+  const item = types.value[initialIndex];
+  if (!item) return;
 
-  const position = calcReorderPosition(types.value, initialIndex, finalIndex)
-  reorderType({ id: item.id, position })
+  const position = calcReorderPosition(types.value, initialIndex, finalIndex);
+  reorderType({ id: item.id, position });
 }
 </script>
 
