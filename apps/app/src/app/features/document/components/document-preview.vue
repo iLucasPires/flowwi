@@ -1,72 +1,72 @@
 <script setup lang="ts">
-import type { iDocumentSelectionAnchor } from '@/app/features/document/types'
-import type { Editor, EditorEvents } from '@tiptap/vue-3'
-import { Emoji } from '@tiptap/extension-emoji'
-import { TextAlign } from '@tiptap/extension-text-align'
-import { CodeBlockShiki } from 'tiptap-extension-code-block-shiki'
-import { createImageUploadExtension } from '@/app/features/document/composables/documentEditorImageUpload'
+import type { iDocumentSelectionAnchor } from "@/app/features/document/types";
+import type { Editor, EditorEvents } from "@tiptap/vue-3";
+import { Emoji } from "@tiptap/extension-emoji";
+import { TextAlign } from "@tiptap/extension-text-align";
+import { CodeBlockShiki } from "tiptap-extension-code-block-shiki";
+import { createImageUploadExtension } from "@/app/features/document/composables/editor/document-editor-image-upload";
 
 /**
  * Read-only rendering of a document's title + content — no editing chrome, no
  * comments/composables wiring. Takes only the data it needs to render, so it can be
  * dropped as-is onto a future public/client-facing screen (e.g. a shared preview link).
  */
-defineOptions({ name: 'DocumentPreview' })
+defineOptions({ name: "DocumentPreview" });
 
 const props = defineProps<{
-  title: string
-  icon?: string
-  hasCover?: boolean
-  content: string
-}>()
+  title: string;
+  icon?: string;
+  hasCover?: boolean;
+  content: string;
+}>();
 
 const emit = defineEmits<{
   /** Fires on every text-selection change inside the content, or `null` once it clears. */
-  selectionChange: [selection: iDocumentSelectionAnchor | null]
-}>()
+  selectionChange: [selection: iDocumentSelectionAnchor | null];
+}>();
 
-const editorRef = useTemplateRef<{ editor?: Editor }>('editorRef')
+const editorRef = useTemplateRef<{ editor?: Editor }>("editorRef");
 
-function onSelectionUpdate({ editor }: EditorEvents['selectionUpdate']) {
-  const { from, to, empty } = editor.state.selection
+function onSelectionUpdate({ editor }: EditorEvents["selectionUpdate"]) {
+  const { from, to, empty } = editor.state.selection;
   if (empty) {
-    emit('selectionChange', null)
-    return
+    emit("selectionChange", null);
+    return;
   }
 
-  const text = editor.state.doc.textBetween(from, to, ' ').trim()
+  const text = editor.state.doc.textBetween(from, to, " ").trim();
   if (!text) {
-    emit('selectionChange', null)
-    return
+    emit("selectionChange", null);
+    return;
   }
 
   // The native selection's bounding box (rather than a single coordsAtPos point)
   // covers multi-line selections and both drag directions correctly, so the
   // toolbar always lands centered over what's actually highlighted.
-  const domSelection = window.getSelection()
-  const range = domSelection && domSelection.rangeCount > 0 ? domSelection.getRangeAt(0) : null
-  const rect = range?.getBoundingClientRect()
+  const domSelection = window.getSelection();
+  const range = domSelection && domSelection.rangeCount > 0 ? domSelection.getRangeAt(0) : null;
+  const rect = range?.getBoundingClientRect();
 
   if (!rect || (rect.width === 0 && rect.height === 0)) {
-    emit('selectionChange', null)
-    return
+    emit("selectionChange", null);
+    return;
   }
 
-  emit('selectionChange', {
+  emit("selectionChange", {
     text,
     top: rect.top,
     bottom: rect.bottom,
     centerX: rect.left + rect.width / 2,
-  })
+  });
 }
 
 watch(
   () => editorRef.value?.editor,
   (editor, prevEditor) => {
-    prevEditor?.off('selectionUpdate', onSelectionUpdate)
-    editor?.on('selectionUpdate', onSelectionUpdate)
+    prevEditor?.off("selectionUpdate", onSelectionUpdate);
+    editor?.on("selectionUpdate", onSelectionUpdate);
   },
-)
+);
 </script>
 
 <template>
@@ -84,7 +84,7 @@ watch(
     </div>
 
     <h1 class="text-3xl sm:text-4xl font-bold tracking-tight text-highlighted break-words">
-      {{ title || 'Sem título' }}
+      {{ title || "Sem título" }}
     </h1>
 
     <UEditor

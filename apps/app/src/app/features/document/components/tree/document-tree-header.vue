@@ -1,21 +1,21 @@
 <script setup lang="ts">
-import type { iDocumentType } from '@/app/features/document/types'
-import type { DropdownMenuItem } from '@nuxt/ui'
-import type { iDocSortOrder } from '@/app/features/document/composables/documentVault'
+import type { iDocumentType } from "@/app/features/document/types";
+import type { DropdownMenuItem } from "@nuxt/ui";
+import type { iDocSortOrder } from "@/app/features/document/types/document-vault";
 
 const props = defineProps<{
-  documentTypes: iDocumentType[]
-}>()
+  documentTypes: iDocumentType[];
+}>();
 
 const emit = defineEmits<{
-  openPalette: []
-  openGraph: []
+  openPalette: [];
+  openGraph: [];
   /** `null` creates a blank document; otherwise the picked type's own `default_content`. */
-  createFromTemplate: [typeId: number | null]
-}>()
+  createFromTemplate: [typeId: number | null];
+}>();
 
-const sortOrder = defineModel<iDocSortOrder>('sortOrder', { required: true })
-const typeFilter = defineModel<(number | null)[]>('typeFilter', { default: () => [] })
+const sortOrder = defineModel<iDocSortOrder>("sortOrder", { required: true });
+const typeFilter = defineModel<(number | null)[]>("typeFilter", { default: () => [] });
 
 // One menu entry per document type — each type's own `default_content` (configured in
 // Settings → Tipos de documento) is what seeds the new document, plus a blank fallback.
@@ -23,18 +23,18 @@ const templateMenuItems = computed<DropdownMenuItem[][]>(() => [
   [
     ...props.documentTypes.map((type) => ({
       label: type.name,
-      icon: type.icon || 'i-lucide-file-plus',
-      onSelect: () => emit('createFromTemplate', type.id),
+      icon: type.icon || "i-lucide-file-plus",
+      onSelect: () => emit("createFromTemplate", type.id),
     })),
     {
-      label: 'Documento em branco',
-      icon: 'i-lucide-file',
-      onSelect: () => emit('createFromTemplate', null),
+      label: "Documento em branco",
+      icon: "i-lucide-file",
+      onSelect: () => emit("createFromTemplate", null),
     },
   ],
-])
+]);
 
-defineOptions({ name: 'DocumentTreeHeader' })
+defineOptions({ name: "DocumentTreeHeader" });
 </script>
 
 <template>
