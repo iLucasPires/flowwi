@@ -1,12 +1,13 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-from lib.models import TimeStampedModel, UUIDModel
+from lib.models import CoverStyleModel, TimeStampedModel, UUIDModel
+from lib.utils.upload import upload_to_path
 
 from .form import Form
 
 
-class FormPage(UUIDModel, TimeStampedModel):
+class FormPage(UUIDModel, TimeStampedModel, CoverStyleModel):
     title = models.CharField(
         max_length=255,
         blank=True,
@@ -26,6 +27,14 @@ class FormPage(UUIDModel, TimeStampedModel):
         default=0,
         verbose_name=_("order"),
         help_text=_("Display order of this page within the form."),
+    )
+
+    cover_image = models.ImageField(
+        upload_to=upload_to_path("forms", "covers"),
+        null=True,
+        blank=True,
+        verbose_name=_("cover image"),
+        help_text=_("A cover image to be displayed at the top of this page."),
     )
 
     form = models.ForeignKey(

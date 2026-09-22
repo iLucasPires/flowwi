@@ -1,7 +1,12 @@
 from django.core.exceptions import ValidationError
 from pydantic import ValidationError as PydanticValidationError
 
-from ..schemas import BLOCK_CONFIG_SCHEMAS, ConditionSchema
+from ..schemas import (
+    BLOCK_CONFIG_SCHEMAS,
+    ConditionGroupSchema,
+    ConditionPayload,
+    ConditionSchema,
+)
 
 
 def validate_form_config(block_type: str, config: dict):
@@ -20,12 +25,16 @@ def validate_form_condition(condition: dict):
     if not condition:
         return
 
-    # Support legacy `client_id` key
+    # Support legacy `client_id` key in single rules
     data = dict(condition)
     if "client_id" in data and "field_id" not in data:
         data["field_id"] = data.pop("client_id")
 
     try:
-        ConditionSchema.model_validate(data)
+        # Try group first, fall back to single rule
+        if "op" in data and "rules" in data:
+            ConditionGroupSchema.model_validate(data)
+        else:
+            ConditionSchema.model_validate(data)
     except PydanticValidationError as e:
         raise ValidationError(e.errors()) from e

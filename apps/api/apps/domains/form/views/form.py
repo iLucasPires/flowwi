@@ -49,7 +49,9 @@ class FormViewSet(WorkplaceViewSetMixin, ModelViewSet):
         permission_classes=[AllowAny],
     )
     def public_detail(self, request: Request, public_id=None):
-        form = self._get_published_form(public_id)
+        # Drafts are visible here too, but only to an authenticated member of the form's
+        # own workplace — this is what makes the editor's "Visualizar" work pre-publish.
+        form = self.service.get_preview(public_id, request.user)
         if not form:
             return Response(status=status.HTTP_404_NOT_FOUND)
         return Response(FormPublicSerializer(form).data)

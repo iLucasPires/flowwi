@@ -4,7 +4,6 @@ import { useWorkplace } from '@/app/features/workplace'
 
 defineOptions({ name: 'WorkplaceListPage' })
 
-const router = useRouter()
 const { workplaces, setCurrent, refreshWorkplaces } = useWorkplace()
 
 const search = ref('')
@@ -21,7 +20,9 @@ const filteredWorkplaces = computed(() => {
 
 async function enterWorkplace(w: iWorkplace) {
   await setCurrent(w)
-  router.push('/dashboard')
+  // Full reload, not a router push — guarantees every composable/query starts
+  // fresh against the newly-selected workplace.
+  window.location.href = '/dashboard'
 }
 </script>
 

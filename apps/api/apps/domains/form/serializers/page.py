@@ -12,4 +12,7 @@ class FormPageSerializer(serializers.ModelSerializer):
             "title",
             "description",
             "order",
+            "cover_image",
+            "cover_style",
+            "cover_credit",
         ]

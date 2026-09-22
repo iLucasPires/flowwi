@@ -9,7 +9,6 @@ defineProps<{
   collapsed?: boolean
 }>()
 
-const router = useRouter()
 const overlay = useOverlay()
 const { profile } = useProfile()
 
@@ -23,12 +22,16 @@ const { clearCurrent: clearWorkplace } = useWorkplace()
 
 const logout = async () => {
   await logoutUser()
-  await router.push('/account/login')
+  // Full reload, not a router push — clears every bit of cached user/workplace
+  // state instead of trusting SPA state to catch up after logging out.
+  window.location.href = '/account/login'
 }
 
 const leaveWorkplace = () => {
   clearWorkplace()
-  router.push('/account/setup/workplace/select')
+  // Full reload, not a router push — clears every bit of cached workplace
+  // state instead of trusting SPA state to catch up after leaving it.
+  window.location.href = '/account/setup/workplace/select'
 }
 
 function openSettings() {

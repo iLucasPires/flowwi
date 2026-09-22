@@ -1,187 +1,251 @@
 <script setup lang="ts">
-import { useWorkplaceMember } from '@/app/features/workplace/composables/workplaceMember'
-import { cWorkplaceRoleBadgeColor } from '@/app/features/workplace/constants'
-import type { iWorkplaceMember } from '@/app/features/workplace/types'
-import type { TableColumn } from '@nuxt/ui'
-import { upperFirst } from 'scule'
+import {
+  useWorkplaceMember,
+  usePendingWorkplaceMembers,
+} from "@/app/features/workplace/composables/workplaceMember";
+import { cWorkplaceRoleBadgeColor } from "@/app/features/workplace/constants";
+import type { iWorkplaceMember } from "@/app/features/workplace/types";
+import type { TableColumn } from "@nuxt/ui";
+import { upperFirst } from "scule";
 
-import type { Row } from '@tanstack/table-core'
-import { getPaginationRowModel } from '@tanstack/table-core'
+import type { Row } from "@tanstack/table-core";
+import { getPaginationRowModel } from "@tanstack/table-core";
 
-const UButton = resolveComponent('UButton')
-const UBadge = resolveComponent('UBadge')
-const UDropdownMenu = resolveComponent('UDropdownMenu')
-const UCheckbox = resolveComponent('UCheckbox')
+const UButton = resolveComponent("UButton");
+const UBadge = resolveComponent("UBadge");
+const UDropdownMenu = resolveComponent("UDropdownMenu");
+const UCheckbox = resolveComponent("UCheckbox");
 
-const editableRoles: { label: string; value: 'manager' | 'designer' }[] = [
-  { label: 'Gerente', value: 'manager' },
-  { label: 'Designer', value: 'designer' },
-]
+const editableRoles: { label: string; value: "manager" | "designer" }[] = [
+  { label: "Gerente", value: "manager" },
+  { label: "Designer", value: "designer" },
+];
 
-const toast = useToast()
-const { members, isLoading: loading, isAdmin, removeMember, updateMemberRole } = useWorkplaceMember()
-const table = useTemplateRef('table')
+const toast = useToast();
+const {
+  members,
+  isLoading: loading,
+  isAdmin,
+  removeMember,
+  updateMemberRole,
+} = useWorkplaceMember();
+const {
+  pendingMembers,
+  isLoading: pendingLoading,
+  approveMember,
+  approveStatus,
+  rejectMember,
+  rejectStatus,
+} = usePendingWorkplaceMembers();
+const table = useTemplateRef("table");
 
-const search = defineModel<string>('search')
-const role = defineModel<string | undefined>('role')
-const rowSelection = ref({})
-const columnVisibility = ref()
-const pagination = ref({ pageIndex: 0, pageSize: 15 })
+const search = defineModel<string>("search");
+const role = defineModel<string | undefined>("role");
+const rowSelection = ref({});
+const columnVisibility = ref();
+const pagination = ref({ pageIndex: 0, pageSize: 15 });
 
 function getRowItems(row: Row<iWorkplaceMember>) {
-  const canManage = isAdmin.value && row.original.role !== 'owner'
+  const canManage = isAdmin.value && row.original.role !== "owner";
 
   return [
-    { type: 'label', label: 'Ações' },
     {
-      label: 'Copiar ID do membro',
-      icon: 'i-lucide-copy',
+      label: "Copiar ID do membro",
+      icon: "i-lucide-copy",
       onSelect() {
-        navigator.clipboard.writeText(row.original.public_id)
+        navigator.clipboard.writeText(row.original.public_id);
         toast.add({
-          title: 'Copiado!',
-          description: 'ID do membro copiado para a área de transferência.',
-        })
+          title: "Copiado!",
+          description: "ID do membro copiado para a área de transferência.",
+        });
       },
     },
-    { type: 'separator' },
-    { label: 'Ver detalhes', icon: 'i-lucide-list' },
+
     ...(canManage
       ? [
-          { type: 'separator' },
+          { type: "separator" },
           {
-            label: 'Editar papel',
-            icon: 'i-lucide-shield-half',
+            label: "Editar papel",
+            icon: "i-lucide-shield-half",
             children: editableRoles.map((option) => ({
               label: option.label,
-              type: 'checkbox' as const,
+              type: "checkbox" as const,
               checked: row.original.role === option.value,
               onSelect(e?: Event) {
-                e?.preventDefault()
-                if (row.original.role === option.value) return
-                updateMemberRole({ publicId: row.original.public_id, role: option.value })
+                e?.preventDefault();
+                if (row.original.role === option.value) return;
+
+                updateMemberRole({
+                  publicId: row.original.public_id,
+                  role: option.value,
+                });
               },
             })),
           },
           {
-            label: 'Remover membro',
-            icon: 'i-lucide-trash',
-            color: 'error',
+            label: "Remover membro",
+            icon: "i-lucide-trash",
+            color: "error",
             onSelect() {
-              removeMember(row.original.public_id)
+              removeMember(row.original.public_id);
             },
           },
         ]
       : []),
-  ]
+  ];
 }
 
 const columns: TableColumn<iWorkplaceMember>[] = [
   {
-    id: 'select',
+    id: "select",
     header: ({ table }) =>
       h(UCheckbox, {
         modelValue: table.getIsSomePageRowsSelected()
-          ? 'indeterminate'
+          ? "indeterminate"
           : table.getIsAllPageRowsSelected(),
-        'onUpdate:modelValue': (value: boolean | 'indeterminate') =>
+        "onUpdate:modelValue": (value: boolean | "indeterminate") =>
           table.toggleAllPageRowsSelected(!!value),
-        ariaLabel: 'Selecionar todos',
+        ariaLabel: "Selecionar todos",
       }),
     cell: ({ row }) =>
       h(UCheckbox, {
         modelValue: row.getIsSelected(),
-        'onUpdate:modelValue': (value: boolean | 'indeterminate') => row.toggleSelected(!!value),
-        ariaLabel: 'Selecionar linha',
+        "onUpdate:modelValue": (value: boolean | "indeterminate") => row.toggleSelected(!!value),
+        ariaLabel: "Selecionar linha",
       }),
   },
   {
-    accessorKey: 'user',
-    header: 'Usuário',
+    accessorKey: "user",
+    header: "Usuário",
     cell: ({ row }) =>
-      h('div', { class: 'flex items-center gap-3' }, [
-        h(resolveComponent('CMemberAvatar'), {
+      h("div", { class: "flex items-center gap-3" }, [
+        h(resolveComponent("CMemberAvatar"), {
           member: row.original,
-          size: 'sm',
+          size: "sm",
         }),
-        h('div', undefined, [
-          h('p', { class: 'font-medium text-default' }, row.original.profile?.full_name ?? '—'),
-          h('p', { class: 'text-xs text-dimmed' }, row.original.profile?.email ?? ''),
+        h("div", undefined, [
+          h("p", { class: "font-medium text-default" }, row.original.profile?.full_name ?? "—"),
+          h("p", { class: "text-xs text-dimmed" }, row.original.profile?.email ?? ""),
         ]),
       ]),
   },
   {
-    accessorKey: 'role',
-    header: 'Papel',
+    accessorKey: "role",
+    header: "Papel",
     cell: ({ row }) => {
-      const color = cWorkplaceRoleBadgeColor[row.original.role] ?? 'neutral'
+      if (row.original.status === "pending") {
+        return h(UBadge, { variant: "subtle", color: "warning", size: "sm" }, () => "Pendente");
+      }
+
+      const color = cWorkplaceRoleBadgeColor[row.original.role] ?? "neutral";
       return h(
         UBadge,
-        { class: 'capitalize', variant: 'subtle', color, size: 'xs' },
+        { class: "capitalize", variant: "subtle", color, size: "sm" },
         () => row.original.role,
-      )
+      );
     },
   },
   {
-    accessorKey: 'created_at',
+    accessorKey: "created_at",
     header: ({ column }) => {
-      const isSorted = column.getIsSorted()
+      const isSorted = column.getIsSorted();
       return h(UButton, {
-        color: 'neutral',
-        variant: 'ghost',
-        label: 'Entrada',
+        size: "xs",
+        color: "neutral",
+        variant: "ghost",
+        label: "Entrada",
         icon: isSorted
-          ? isSorted === 'asc'
-            ? 'i-lucide-arrow-up-narrow-wide'
-            : 'i-lucide-arrow-down-wide-narrow'
-          : 'i-lucide-arrow-up-down',
-        class: '-mx-2 font-medium text-dimmed text-[11px] uppercase tracking-wider',
-        onClick: () => column.toggleSorting(column.getIsSorted() === 'asc'),
-      })
+          ? isSorted === "asc"
+            ? "i-lucide-arrow-up-narrow-wide"
+            : "i-lucide-arrow-down-wide-narrow"
+          : "i-lucide-arrow-up-down",
+        class: "-mx-2 font-medium text-dimmed text-[11px] uppercase tracking-wider",
+        onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
+      });
     },
     cell: ({ row }) =>
       row.original.created_at
         ? h(
-            'span',
-            { class: 'text-xs text-dimmed tabular-nums' },
-            new Date(row.original.created_at).toLocaleDateString('pt-BR', {
-              day: 'numeric',
-              month: 'short',
-              year: 'numeric',
+            "span",
+            { class: "text-xs text-dimmed tabular-nums" },
+            new Date(row.original.created_at).toLocaleDateString("pt-BR", {
+              day: "numeric",
+              month: "short",
+              year: "numeric",
             }),
           )
-        : '—',
+        : "—",
   },
   {
-    id: 'actions',
-    cell: ({ row }) =>
-      h(
-        'div',
-        { class: 'flex items-center justify-end' },
-        h(UDropdownMenu, { content: { align: 'end' }, items: getRowItems(row) }, () =>
+    id: "actions",
+    cell: ({ row }) => {
+      if (row.original.status === "pending") {
+        return h("div", { class: "flex items-center justify-end gap-1.5" }, [
           h(UButton, {
-            icon: 'i-lucide-more-horizontal',
-            color: 'neutral',
-            variant: 'ghost',
+            label: "Recusar",
+            size: "xs",
+            variant: "ghost",
+            color: "neutral",
+            loading: rejectStatus.value === "pending",
+            onClick: () => rejectMember(row.original.public_id),
           }),
+          h(UButton, {
+            label: "Aprovar",
+            icon: "i-lucide-check",
+            size: "xs",
+            color: "primary",
+            loading: approveStatus.value === "pending",
+            onClick: () => approveMember(row.original.public_id),
+          }),
+        ]);
+      }
+
+      return h(
+        "div",
+        { class: "flex items-center justify-end" },
+        h(
+          UDropdownMenu,
+          {
+            size: "xs",
+            content: { align: "end" },
+            items: getRowItems(row),
+          },
+          () =>
+            h(UButton, {
+              icon: "i-lucide-more-horizontal",
+              size: "xs",
+              color: "neutral",
+              variant: "ghost",
+            }),
         ),
-      ),
+      );
+    },
   },
-]
+];
+
+const allMembers = computed(() =>
+  isAdmin.value ? [...pendingMembers.value, ...members.value] : members.value,
+);
 
 const filteredMembers = computed(() => {
-  const list = members.value ?? []
-  const q = (search.value ?? '').trim().toLowerCase()
+  const list = allMembers.value;
+  const q = (search.value ?? "").trim().toLowerCase();
 
-  return list.filter(
-    (m) =>
-      (!q ||
-        m.profile?.full_name?.toLowerCase().includes(q) ||
-        m.profile?.email?.toLowerCase().includes(q) ||
-        m.role?.toLowerCase().includes(q)) &&
-      (!role.value || m.role === role.value),
-  )
-})
+  return list.filter((m) => {
+    const matchesSearch =
+      !q ||
+      m.profile?.full_name?.toLowerCase().includes(q) ||
+      m.profile?.email?.toLowerCase().includes(q) ||
+      m.role?.toLowerCase().includes(q);
+
+    if (!matchesSearch) return false;
+
+    // Pending requests aren't subject to the role filter — they're not "in" a role yet.
+    if (m.status === "pending") return true;
+
+    return !role.value || m.role === role.value;
+  });
+});
 </script>
 
 <template>
@@ -195,7 +259,7 @@ const filteredMembers = computed(() => {
         color="error"
         variant="subtle"
         icon="i-lucide-trash"
-        size="sm"
+        size="xs"
       >
         <template #trailing>
           <UKbd>{{ table?.tableApi?.getFilteredSelectedRowModel()?.rows?.length }}</UKbd>
@@ -213,10 +277,10 @@ const filteredMembers = computed(() => {
               type: 'checkbox' as const,
               checked: column.getIsVisible(),
               onUpdateChecked(checked: boolean) {
-                table?.tableApi?.getColumn(column.id)?.toggleVisibility(!!checked)
+                table?.tableApi?.getColumn(column.id)?.toggleVisibility(!!checked);
               },
               onSelect(e?: Event) {
-                e?.preventDefault()
+                e?.preventDefault();
               },
             }))
         "
@@ -227,7 +291,7 @@ const filteredMembers = computed(() => {
           color="neutral"
           variant="ghost"
           trailing-icon="i-lucide-filter"
-          size="sm"
+          size="xs"
         />
       </UDropdownMenu>
     </div>
@@ -242,7 +306,7 @@ const filteredMembers = computed(() => {
         :pagination-options="{ getPaginationRowModel: getPaginationRowModel() }"
         :data="filteredMembers"
         :columns="columns"
-        :loading="loading"
+        :loading="loading || pendingLoading"
         class="w-full"
         :ui="{
           th: 'py-2.5 px-4 font-semibold text-[11px] uppercase tracking-wider text-dimmed bg-accented/30 focus:outline-none',
@@ -265,7 +329,7 @@ const filteredMembers = computed(() => {
         :total="table?.tableApi?.getFilteredRowModel()?.rows?.length || 0"
         variant="ghost"
         color="neutral"
-        size="sm"
+        size="xs"
         @update:page="(p: number) => table?.tableApi?.setPageIndex(p - 1)"
       />
     </div>

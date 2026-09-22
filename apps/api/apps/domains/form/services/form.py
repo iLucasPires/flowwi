@@ -43,6 +43,26 @@ class FormService(ServiceBase):
     # keep backward compat alias
     get_public_form = get_published
 
+    def get_preview(self, public_id: str, user) -> Form | None:
+        """
+        Same lookup as `get_published`, plus one exception: an authenticated member of
+        the form's workplace can also see it while it's still a draft — this is what
+        lets the editor's "Visualizar" open the public page before publishing.
+        """
+        form = FormSelector.get_by_public_id(public_id)
+        if form is None:
+            return None
+        if form.is_published:
+            return form
+        if (
+            user
+            and user.is_authenticated
+            and form.workplace_id
+            and form.workplace.members.filter(user=user, status="active").exists()
+        ):
+            return form
+        return None
+
     def get_insights(self, form: Form) -> dict:
         total = form.responses.count()
         blocks = form.blocks.order_by("page__order", "order")

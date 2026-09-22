@@ -37,6 +37,12 @@ class WorkplaceMemberViewSet(
 
         queryset = self.queryset.filter(workplace=workplace)
 
+        # The status filter only makes sense for the collection endpoint — detail
+        # actions (retrieve/update/destroy/approve) must be able to find a member
+        # regardless of status, e.g. approving or rejecting a pending request.
+        if self.action != "list":
+            return queryset
+
         status_param = self.request.query_params.get("status")
         if status_param == WorkplaceMemberStatus.PENDING:
             return queryset.filter(status=WorkplaceMemberStatus.PENDING)

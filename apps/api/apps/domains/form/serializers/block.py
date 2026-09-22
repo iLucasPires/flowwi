@@ -20,6 +20,10 @@ class FormBlockSerializer(serializers.ModelSerializer):
             "col_span",
             "col_start",
             "condition",
+            "default_value",
+            "prefix",
+            "suffix",
+            "logic_jump",
             "client_id",
         ]
 

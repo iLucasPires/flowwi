@@ -4,7 +4,6 @@ from .views import (
     FormBlockViewSet,
     FormPageViewSet,
     FormResponseViewSet,
-    FormThemeViewSet,
     FormViewSet,
 )
 
@@ -14,6 +13,5 @@ router.register(r"forms", FormViewSet)
 router.register(r"form-blocks", FormBlockViewSet)
 router.register(r"form-pages", FormPageViewSet)
 router.register(r"form-responses", FormResponseViewSet)
-router.register(r"form-themes", FormThemeViewSet)
 
 urlpatterns = router.urls
